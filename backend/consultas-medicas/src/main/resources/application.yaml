@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: consultas-medicas
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5433/clinicdb
+    username: postgres
+    password: postgres
+    hikari:
+      pool-name: consultas-hikari
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 600000
+      connection-timeout: 30000
+      max-lifetime: 1800000
+
+  jpa:
+
+    show-sql: true
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+
+        format_sql: true
+        jdbc.time_zone: America/Sao_Paulo
+
+  data:
+    web:
+      pageable:
+        page-parameter: page
+        size-parameter: per_page
+        one-indexed-parameters: true
+        default-page-size: 10
+        max-page-size: 100
+
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+
+logging:
+  level:
+    org.hibernate.SQL: warn
+    org.hibernate.type.descriptor.sql: warn
+    org.springframework.security: info
