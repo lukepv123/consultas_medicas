@@ -1,0 +1,363 @@
+{
+	"info": {
+		"_postman_id": "a6dce983-5d09-4e82-9b29-0736b5ca2f13",
+		"name": "ConsultasMedicas",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "41009159"
+	},
+	"item": [
+		{
+			"name": "Adm",
+			"item": [
+				{
+					"name": "Cadastro Medico",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "admin123",
+								"username": "admin"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \"crm\": \"{{crm}}\",   \"nome\": \"{{nome}}\",   \"email\": \"{{email}}\",   \"senha\": \"{{senha}}\",   \"especialidade\": \"{{especialidade}}\" }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseURL}}/medicos"
+					},
+					"response": []
+				},
+				{
+					"name": "Cancelar Consulta",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "admin123",
+								"username": "admin"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{  \r\n\"cpfPaciente\": \"{{cpf}}\",   \r\n\"dataHoraConsulta\": \"{{dataHoraConsulta}}\",   \r\n\"justificativa\": \"{{justificativa}}\" }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/consultas/cancelamento"
+					},
+					"response": []
+				}
+			],
+			"description": "Operations that the role operator can use"
+		},
+		{
+			"name": "Operador",
+			"item": [
+				{
+					"name": "Buscar Paciente por ID",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "operador123",
+								"username": "operador"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{baseURL}}/pacientes/{{id_paciente}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Medico",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "operador123",
+								"username": "operador"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL\n}}/medicos?per_page={{per_page}}&pag={{pag}}&especialidade={{especialidade}}",
+							"host": [
+								"{{baseURL\n}}"
+							],
+							"path": [
+								"medicos"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "{{per_page}}"
+								},
+								{
+									"key": "pag",
+									"value": "{{pag}}"
+								},
+								{
+									"key": "especialidade",
+									"value": "{{especialidade}}",
+									"description": "Not mandatory"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Paciente",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "operador123",
+								"username": "operador"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \"cpf\": \"{{cpf}}\",  \r\n\"nome\": \"{{nome}}\",   \r\n\"email\": \"{{email}}\",   \r\n\"senha\": \"{{senha}}\" }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseURL}}/pacientes"
+					},
+					"response": []
+				},
+				{
+					"name": "Cadastrar Consulta",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "operador123",
+								"username": "operador"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \r\n\"dataHoraConsulta\": \"{{dataHoraConsulta}}\",   \r\n\"idMedico\": \"{{id_medico}}\",   \r\n\"idPaciente\": \"{{id_paciente}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseURL}}/consultas"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Histórico de Consultas por Paciente",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "operador123",
+								"username": "operador"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/consultas/paciente/{{id_paciente}}/passadas?page={{pag}}&per_page={{per_page}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"consultas",
+								"paciente",
+								"{{id_paciente}}",
+								"passadas"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "{{pag}}"
+								},
+								{
+									"key": "per_page",
+									"value": "{{per_page}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Consultas Futuras por Paciente",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "operador123",
+								"username": "operador"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/consultas/paciente/{{id_paciente}}/futuras?page={{pag}}&per_page={{per_page}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"consultas",
+								"paciente",
+								"{{id_paciente}}",
+								"futuras"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "{{pag}}"
+								},
+								{
+									"key": "per_page",
+									"value": "{{per_page}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Consultas Futuras por Medico",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "operador123",
+								"username": "operador"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \"current_page\": 1, \r\n    \"total_pages\": 5, \r\n    \"total_items\": 100,\r\n    \"per_page\": 20, \r\n    \"data\": [   \r\n                { \"id\": \"uuid\",\r\n                    \"crm\": \"string\",\r\n                    \"nome\": \"string\",\r\n                    \"email\": \"string\",\r\n                    \"especialidade\": \"string\" \r\n                }  \r\n            ] \r\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/consultas/medico/{{id_medico}}/futuras?page={{pag}}&per_page={{per_page}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"consultas",
+								"medico",
+								"{{id_medico}}",
+								"futuras"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "{{pag}}"
+								},
+								{
+									"key": "per_page",
+									"value": "{{per_page}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cadastrar Prontuario",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "medico123",
+								"username": "medico"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \"idPaciente\": \"{{id_paciente}}\",   \r\n\"atendimento\": \"{{atendimento}}\",   \r\n\"alergias\": \"{{alergias}}\",   \r\n\"deficiencia\": \"{{deficiencia}}\",   \r\n\"comorbidade\": \"{{comorbidade}}\",   \r\n\"exames\": \"{{exames}}\",   \r\n\"medicacao\": \"{{medicacao}}\" }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseURL}}/prontuarios"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Prontuários por Paciente",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "medico123",
+								"username": "medico"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \"idPaciente\": \"{{id_paciente}}\",   \r\n\"atendimento\": \"{{atendimento}}\",   \r\n\"alergias\": \"{{alergias}}\",   \r\n\"deficiencia\": \"{{deficiencia}}\",   \r\n\"comorbidade\": \"{{comorbidade}}\",   \r\n\"exames\": \"{{exames}}\",   \r\n\"medicacao\": \"{{medicacao}}\" }"
+						},
+						"url": {
+							"raw": "{{baseURL}}/prontuarios/paciente/{{id_paciente}}?page={{pag}}&per_page={{per_page}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"prontuarios",
+								"paciente",
+								"{{id_paciente}}"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "{{pag}}"
+								},
+								{
+									"key": "per_page",
+									"value": "{{per_page}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints"
+		}
+	]
+}
