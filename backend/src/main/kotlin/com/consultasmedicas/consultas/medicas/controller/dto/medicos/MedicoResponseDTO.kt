@@ -7,6 +7,6 @@ data class MedicoResponseDTO(
     val id: UUID,
     val crm: String,
     val nome: String,
-    val email: String,
+    val email: String?, // vem do User vinculado
     val especialidade: Especialidade
 )

@@ -1,0 +1,414 @@
+{
+	"info": {
+		"_postman_id": "b69b8f9c-a5b5-41e5-88a2-ed3888f3cc24",
+		"name": "ConsultasMedicas 2.0",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "41009159"
+	},
+	"item": [
+		{
+			"name": "Adm",
+			"item": [
+				{
+					"name": "Cadastro Medico",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"username": "admin@clinica.com",
+								"password": "Admin#2025"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"crm\": \"52562672729\",\r\n    \"nome\": \"João da Silvasss\",\r\n    \"especialidade\": \"{{especialidade}}\",\r\n    \"account\": {\r\n      \"email\": \"joao@medico.com\",\r\n      \"senha\": \"Medico#2025\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseURL}}/medicos"
+					},
+					"response": []
+				},
+				{
+					"name": "Cancelar Consulta",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "admin123",
+								"username": "admin"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{  \r\n\"cpfPaciente\": \"{{cpf}}\",   \r\n\"dataHoraConsulta\": \"{{dataHoraConsulta}}\",   \r\n\"justificativa\": \"{{justificativa}}\" }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/consultas/cancelamento"
+					},
+					"response": []
+				}
+			],
+			"description": "Operations that the role operator can use"
+		},
+		{
+			"name": "Paciente",
+			"item": [
+				{
+					"name": "Buscar Paciente por ID",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "operador123",
+								"username": "operador"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{baseURL}}/pacientes/{{id_paciente}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Medico",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "operador123",
+								"username": "operador"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}}}/medicos?per_page={{per_page}}&pag={{pag}}",
+							"host": [
+								"{{baseURL}}}}"
+							],
+							"path": [
+								"medicos"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "{{per_page}}"
+								},
+								{
+									"key": "pag",
+									"value": "{{pag}}"
+								},
+								{
+									"key": "especialidade",
+									"value": "{{especialidade}}",
+									"description": "Not mandatory",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Paciente",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"cpf\": \"52562675729\",\r\n    \"nome\": \"Lucas da Silvasss\",\r\n    \"account\": {\r\n      \"email\": \"lucas@paciente.com\",\r\n      \"senha\": \"Paciente#2025\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseURL}}/pacientes"
+					},
+					"response": []
+				},
+				{
+					"name": "Cadastrar Consulta",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "operador123",
+								"username": "operador"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \r\n\"dataHoraConsulta\": \"{{dataHoraConsulta}}\",   \r\n\"idMedico\": \"{{id_medico}}\",   \r\n\"idPaciente\": \"{{id_paciente}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseURL}}/consultas"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Histórico de Consultas por Paciente",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "operador123",
+								"username": "operador"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/consultas/paciente/{{id_paciente}}/passadas?page={{pag}}&per_page={{per_page}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"consultas",
+								"paciente",
+								"{{id_paciente}}",
+								"passadas"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "{{pag}}"
+								},
+								{
+									"key": "per_page",
+									"value": "{{per_page}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Consultas Futuras por Paciente",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "operador123",
+								"username": "operador"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/consultas/paciente/{{id_paciente}}/futuras?page={{pag}}&per_page={{per_page}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"consultas",
+								"paciente",
+								"{{id_paciente}}",
+								"futuras"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "{{pag}}"
+								},
+								{
+									"key": "per_page",
+									"value": "{{per_page}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Consultas Futuras por Medico",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "operador123",
+								"username": "operador"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \"current_page\": 1, \r\n    \"total_pages\": 5, \r\n    \"total_items\": 100,\r\n    \"per_page\": 20, \r\n    \"data\": [   \r\n                { \"id\": \"uuid\",\r\n                    \"crm\": \"string\",\r\n                    \"nome\": \"string\",\r\n                    \"email\": \"string\",\r\n                    \"especialidade\": \"string\" \r\n                }  \r\n            ] \r\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/consultas/medico/{{id_medico}}/futuras?page={{pag}}&per_page={{per_page}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"consultas",
+								"medico",
+								"{{id_medico}}",
+								"futuras"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "{{pag}}"
+								},
+								{
+									"key": "per_page",
+									"value": "{{per_page}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cadastrar Prontuario",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "medico123",
+								"username": "medico"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \"idPaciente\": \"{{id_paciente}}\",   \r\n\"atendimento\": \"{{atendimento}}\",   \r\n\"alergias\": \"{{alergias}}\",   \r\n\"deficiencia\": \"{{deficiencia}}\",   \r\n\"comorbidade\": \"{{comorbidade}}\",   \r\n\"exames\": \"{{exames}}\",   \r\n\"medicacao\": \"{{medicacao}}\" }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseURL}}/prontuarios"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Prontuários por Paciente",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "medico123",
+								"username": "medico"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \"idPaciente\": \"{{id_paciente}}\",   \r\n\"atendimento\": \"{{atendimento}}\",   \r\n\"alergias\": \"{{alergias}}\",   \r\n\"deficiencia\": \"{{deficiencia}}\",   \r\n\"comorbidade\": \"{{comorbidade}}\",   \r\n\"exames\": \"{{exames}}\",   \r\n\"medicacao\": \"{{medicacao}}\" }"
+						},
+						"url": {
+							"raw": "{{baseURL}}/prontuarios/paciente/{{id_paciente}}?page={{pag}}&per_page={{per_page}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"prontuarios",
+								"paciente",
+								"{{id_paciente}}"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "{{pag}}"
+								},
+								{
+									"key": "per_page",
+									"value": "{{per_page}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints"
+		},
+		{
+			"name": "Login",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "Admin#2025",
+								"username": "admin@clinica.com"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{baseURL}}/auth/session"
+					},
+					"response": []
+				},
+				{
+					"name": "SetupStatus",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{baseURL}}/setup/status"
+					},
+					"response": []
+				},
+				{
+					"name": "CreateAdm",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"admin@clinica.com\",\r\n    \"senha\": \"Admin#202wwew5\"\r\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseURL}}/setup/admin"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

@@ -4,11 +4,12 @@ import com.consultasmedicas.consultas.medicas.controller.dto.medicos.MedicoRespo
 import com.consultasmedicas.consultas.medicas.model.Medico
 
 object MedicoMapper {
-    fun toDTO(e: Medico) = MedicoResponseDTO(
-        id = e.id!!,
-        crm = e.crm,
-        nome = e.nome,
-        email = e.email,
-        especialidade = e.especialidade
-    )
+    fun toDTO(e: Medico, email: String?): MedicoResponseDTO =
+        MedicoResponseDTO(
+            id = e.id!!,
+            crm = e.crm,
+            nome = e.nome,
+            email = email ?: "", // mantém contrato não-nulo; ajuste se preferir nullable
+            especialidade = e.especialidade
+        )
 }
