@@ -1,0 +1,16 @@
+<resources>
+    <!-- Cores principais do aplicativo -->
+    <color name="colorPrimary">#1976D2</color>
+    <color name="colorPrimaryDark">#004BA0</color>
+    <color name="colorAccent">#03DAC5</color>
+
+    <!-- Fundo e texto -->
+    <color name="backgroundLight">#FFFFFF</color>
+    <color name="backgroundDark">#121212</color>
+    <color name="textPrimary">#212121</color>
+    <color name="textSecondary">#757575</color>
+
+    <!-- Outros -->
+    <color name="errorColor">#D32F2F</color>
+    <color name="successColor">#388E3C</color>
+</resources>

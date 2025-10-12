@@ -1,0 +1,14 @@
+<resources>
+    <!-- Modo noturno (cores escuras) -->
+    <color name="colorPrimary">#90CAF9</color>
+    <color name="colorPrimaryDark">#0D47A1</color>
+    <color name="colorAccent">#80CBC4</color>
+
+    <color name="backgroundLight">#121212</color>
+    <color name="backgroundDark">#000000</color>
+    <color name="textPrimary">#FFFFFF</color>
+    <color name="textSecondary">#BDBDBD</color>
+
+    <color name="errorColor">#EF9A9A</color>
+    <color name="successColor">#A5D6A7</color>
+</resources>

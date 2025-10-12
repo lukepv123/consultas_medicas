@@ -1,5 +1,6 @@
 package com.consultasmedicas.consultas.medicas.controller
 
+import com.consultasmedicas.consultas.medicas.controller.dto.pacientes.IdResponse
 import com.consultasmedicas.consultas.medicas.controller.dto.pacientes.PacienteCreateDTO
 import com.consultasmedicas.consultas.medicas.service.PacienteService
 import jakarta.annotation.security.PermitAll
@@ -42,4 +43,19 @@ class PacienteController(
         catch (ex: jakarta.persistence.EntityNotFoundException) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, ex.message)
         }
+
+
+
+    // 🆕 CPF → ID — ADMIN/PACIENTE/MEDICO
+    @GetMapping("/cpf/{cpf}/id")
+    @PreAuthorize("hasAnyRole('ADMIN','PACIENTE','MEDICO')")
+    fun buscarIdPorCpf(@PathVariable cpf: String): IdResponse = try {
+        IdResponse(service.buscarIdPorCpf(cpf))
+    } catch (ex: IllegalArgumentException) {
+        throw ResponseStatusException(HttpStatus.BAD_REQUEST, ex.message)
+    } catch (ex: NoSuchElementException) {
+        throw ResponseStatusException(HttpStatus.NOT_FOUND, ex.message)
+    }
+
+
 }

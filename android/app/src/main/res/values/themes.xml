@@ -1,0 +1,27 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Tema principal -->
+    <style name="Theme.ClinicsApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Paleta de cores -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorSecondary">@color/colorAccent</item>
+        <item name="colorSurface">@color/backgroundLight</item>
+        <item name="colorOnSurface">@color/textPrimary</item>
+
+        <!-- Fundo e status bar -->
+        <item name="android:windowBackground">@color/backgroundLight</item>
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+        <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
+
+        <!-- Tipografia -->
+        <item name="android:textColor">@color/textPrimary</item>
+    </style>
+
+    <!-- Tema sem ActionBar -->
+    <style name="Theme.ClinicsApp.NoActionBar" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+        <item name="android:windowBackground">@color/backgroundLight</item>
+    </style>
+</resources>

@@ -42,4 +42,16 @@ class PacienteService(
         val email = p.id?.let { /* consulta leve ou projeção; pode criar um repo custom */ null }
         return PacienteResponseDTO(p.id!!, p.cpf, p.nome, email)
     }
+
+
+
+    fun buscarIdPorCpf(cpfInput: String): UUID {
+        val digits = cpfInput.filter { it.isDigit() }
+        require(digits.length == 11) { "CPF deve conter 11 dígitos." }
+
+        return repo.findIdByCpfDigits(digits)
+            .orElseThrow { NoSuchElementException("Paciente não encontrado para o CPF informado.") }
+    }
+
+
 }
