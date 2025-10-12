@@ -1,6 +1,5 @@
 package com.consultasmedicas.consultas.medicas.repository
 
-
 import com.consultasmedicas.consultas.medicas.model.Consulta
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -28,4 +27,18 @@ interface ConsultaRepository : JpaRepository<Consulta, UUID> {
         idPaciente: UUID,
         dataHoraConsulta: OffsetDateTime
     ): Optional<Consulta>
+
+//-------------------------------------------------------------------
+    // ➕ novos para checar apenas AGENDADAS
+    fun existsByIdMedicoAndDataHoraConsultaAndStatus(
+        idMedico: UUID,
+        dataHoraConsulta: OffsetDateTime,
+        status: String
+    ): Boolean
+
+    fun existsByIdPacienteAndDataHoraConsultaAndStatus(
+        idPaciente: UUID,
+        dataHoraConsulta: OffsetDateTime,
+        status: String
+    ): Boolean
 }

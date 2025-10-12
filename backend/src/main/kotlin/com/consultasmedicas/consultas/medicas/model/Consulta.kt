@@ -6,10 +6,7 @@ import java.time.OffsetDateTime
 import java.util.*
 
 @Entity
-@Table(
-    name = "consultas",
-    uniqueConstraints = [UniqueConstraint(name = "uk_consulta_medico_hora", columnNames = ["id_medico","data_hora"])]
-)
+@Table(name = "consultas")
 class Consulta(
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     var id: UUID? = null,
