@@ -18,7 +18,7 @@ The goal is to integrate **frontend** and **backend** into a complete project. �
 
 ```
 
-- **android/** → Android application developed in **Java/Kotlin**, responsible for the user interface.  
+- **android/** → Android application developed in **Kotlin**, responsible for the user interface.  
 - **backend/** → REST API built with **Spring Boot**, responsible for business logic and data persistence.  
 
 ---
@@ -71,7 +71,7 @@ curl -u admin:123456 http://localhost:8080/medicos
 
 * ☕ **Java 21**
 * 🌱 **Spring Boot 3**
-* 🛢️ **PostgreSQL / MySQL / H2**
+* 🛢️ **PostgreSQL**
 * 🔐 **Spring Security (Basic Auth)**
 * 📖 **Swagger/OpenAPI**
 * 📦 **Docker**
