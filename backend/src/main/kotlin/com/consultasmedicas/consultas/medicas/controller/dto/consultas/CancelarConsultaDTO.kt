@@ -7,6 +7,9 @@ import java.time.OffsetDateTime
 
 data class CancelarConsultaDTO (
 
+    @field:NotBlank(message = "campo obrigatório")
+    val idConsulta: String,
+
     @field:NotBlank(message = "campo obrigatorio")
     val cpfPaciente: String,
 

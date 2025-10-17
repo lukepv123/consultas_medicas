@@ -119,15 +119,51 @@ class ConsultaService(
         status = c.status
     )
 
+//    @Transactional
+//    fun cancelar(dto: CancelarConsultaDTO, usuario: String) {
+//        val paciente = pacienteRepo.findByCpf(dto.cpfPaciente.trim())
+//            .orElseThrow { EntityNotFoundException("Paciente não encontrado") }
+//
+//        val consulta = repo.findByIdPacienteAndDataHoraConsulta(paciente.id!!, dto.dataHoraConsulta)
+//            .orElseThrow { EntityNotFoundException("Consulta nao encontrada") }
+//
+//        if (consulta.status != "AGENDADA") throw IllegalArgumentException("Consulta não pode ser cancelada")
+//
+//        consulta.status = "CANCELADA"
+//        consulta.usuarioUltimaAtualizacao = usuario
+//        consulta.dataUltimaAtualizacao = OffsetDateTime.now()
+//        repo.save(consulta)
+//    }
+
+
     @Transactional
     fun cancelar(dto: CancelarConsultaDTO, usuario: String) {
+
+        // 🆕 1️⃣ Se o app enviou o ID da consulta, cancela direto por ele
+        if (!dto.idConsulta.isNullOrBlank()) {
+            val consulta = repo.findById(UUID.fromString(dto.idConsulta))
+                .orElseThrow { EntityNotFoundException("Consulta não encontrada pelo ID informado") }
+
+            if (consulta.status != "AGENDADA")
+                throw IllegalArgumentException("Consulta não pode ser cancelada (status atual: ${consulta.status})")
+
+            consulta.status = "CANCELADA"
+            consulta.usuarioUltimaAtualizacao = usuario
+            consulta.dataUltimaAtualizacao = OffsetDateTime.now()
+            repo.save(consulta)
+            return
+        }
+
+        // 🧩 2️⃣ Fallback — método antigo (CPF + dataHora)
         val paciente = pacienteRepo.findByCpf(dto.cpfPaciente.trim())
             .orElseThrow { EntityNotFoundException("Paciente não encontrado") }
 
-        val consulta = repo.findByIdPacienteAndDataHoraConsulta(paciente.id!!, dto.dataHoraConsulta)
-            .orElseThrow { EntityNotFoundException("Consulta nao encontrada") }
+        // 🔍 pode retornar mais de uma, então pegamos a AGENDADA mais recente
+        val consultas = repo.findAll()
+            .filter { it.idPaciente == paciente.id && it.dataHoraConsulta == dto.dataHoraConsulta }
 
-        if (consulta.status != "AGENDADA") throw IllegalArgumentException("Consulta não pode ser cancelada")
+        val consulta = consultas.firstOrNull { it.status == "AGENDADA" }
+            ?: throw EntityNotFoundException("Nenhuma consulta AGENDADA encontrada para o CPF e horário informados")
 
         consulta.status = "CANCELADA"
         consulta.usuarioUltimaAtualizacao = usuario

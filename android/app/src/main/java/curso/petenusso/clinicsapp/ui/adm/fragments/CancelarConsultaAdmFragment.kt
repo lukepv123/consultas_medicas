@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import curso.petenusso.clinicsapp.api.RetrofitFactory
@@ -26,7 +27,7 @@ class CancelarConsultaAdmFragment : Fragment() {
     private val pacienteApi by lazy { RetrofitFactory.retrofit().create(PacienteApi::class.java) }
     private val consultaApi by lazy { RetrofitFactory.retrofit().create(ConsultaApi::class.java) }
 
-    // cache da lista (apenas AGENDADA) para recuperar a seleção
+    // cache das consultas agendadas
     private var consultasCarregadas: List<ConsultaResumoDTO> = emptyList()
 
     private val CPF_DIGITS_ONLY = Regex("^[0-9]{11}$")
@@ -40,7 +41,7 @@ class CancelarConsultaAdmFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.btnReturn.setOnClickListener { Navigator.backToAdminLobby(this) }
         binding.btnBuscarConsultas.setOnClickListener { carregarConsultasPorCpf() }
-        binding.btnCancelar.setOnClickListener { cancelarConsultaSelecionada() }
+        binding.btnCancelar.setOnClickListener { confirmarCancelamento() }
     }
 
     private fun setLoading(loading: Boolean) {
@@ -53,7 +54,7 @@ class CancelarConsultaAdmFragment : Fragment() {
         binding.spConsultas.isEnabled = !loading
     }
 
-    /** Fluxo: CPF -> ID -> listar futuras por ID (apenas AGENDADA) */
+    /** Busca consultas futuras do paciente (status AGENDADA) */
     @RequiresApi(Build.VERSION_CODES.O)
     private fun carregarConsultasPorCpf() {
         val cpf = binding.edtCpf.text.toString().trim()
@@ -65,51 +66,49 @@ class CancelarConsultaAdmFragment : Fragment() {
         setLoading(true)
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                // 1) buscar ID por CPF
+                // 1️⃣ Buscar o ID do paciente
                 val idResp = pacienteApi.buscarIdPorCpf(cpf)
                 if (!idResp.isSuccessful) {
                     setLoading(false)
                     val err = idResp.errorBody()?.string()
-                    toast(err?.takeIf { it.isNotBlank() } ?: "Não foi possível obter o ID do paciente (${idResp.code()}).")
+                    toast(err ?: "Não foi possível obter o ID do paciente (${idResp.code()}).")
                     return@launch
                 }
+
                 val pacienteId = idResp.body()?.id ?: run {
                     setLoading(false)
-                    toast("Resposta inválida ao buscar ID do paciente.")
+                    toast("Paciente não encontrado.")
                     return@launch
                 }
 
-                // 2) listar futuras por ID
-                val resp = consultaApi.listarFuturasPorPacienteId(idPaciente = pacienteId, page = 1, perPage = 50)
+                // 2️⃣ Listar consultas futuras
+                val resp = consultaApi.listarFuturasPorPacienteId(pacienteId, 1, 50)
                 if (resp.isSuccessful) {
-                    val envelope = resp.body()
-                    val todas = envelope?.list().orEmpty()
-
-                    // 🔎 filtro local: somente AGENDADA
-                    val filtradas = todas.filter { it.status?.equals("AGENDADA", ignoreCase = true) == true }
+                    val todas = resp.body()?.list().orEmpty()
+                    val filtradas = todas.filter { it.status.equals("AGENDADA", ignoreCase = true) }
                     consultasCarregadas = filtradas
 
                     if (filtradas.isEmpty()) {
-                        binding.spConsultas.adapter = null
                         setLoading(false)
+                        binding.spConsultas.adapter = null
                         toast("Nenhuma consulta AGENDADA encontrada para este paciente.")
                         return@launch
                     }
 
                     val itensVisuais = filtradas.map { c ->
                         val quando = c.dataHoraConsulta?.let(::formatIsoToLocal) ?: "—"
-                        // como todas são AGENDADA, opcional mostrar o status
                         "$quando [AGENDADA]"
                     }
 
-                    binding.spConsultas.adapter =
-                        ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, itensVisuais)
-
+                    binding.spConsultas.adapter = ArrayAdapter(
+                        requireContext(),
+                        android.R.layout.simple_spinner_dropdown_item,
+                        itensVisuais
+                    )
                     setLoading(false)
                 } else {
-                    val err = resp.errorBody()?.string()
                     setLoading(false)
-                    toast(err?.takeIf { it.isNotBlank() } ?: "Falha ao buscar consultas (${resp.code()}).")
+                    toast("Erro ao buscar consultas (${resp.code()}).")
                 }
             } catch (t: Throwable) {
                 setLoading(false)
@@ -118,42 +117,52 @@ class CancelarConsultaAdmFragment : Fragment() {
         }
     }
 
-    /** POST /consultas/cancelamento — enviando CPF e dataHoraConsulta */
+    /** Exibe confirmação antes de cancelar */
+    private fun confirmarCancelamento() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Confirmar cancelamento")
+            .setMessage("Deseja realmente cancelar esta consulta?")
+            .setPositiveButton("Sim") { dialog, _ ->
+                dialog.dismiss()
+                cancelarConsultaSelecionada()
+            }
+            .setNegativeButton("Não") { dialog, _ -> dialog.dismiss() }
+            .show()
+    }
+
+    /** Cancela a consulta selecionada com base no ID */
     private fun cancelarConsultaSelecionada() {
         val cpf = binding.edtCpf.text.toString().trim()
         if (!CPF_DIGITS_ONLY.matches(cpf)) {
-            toast("Informe um CPF com 11 dígitos (somente números).")
+            toast("Informe um CPF válido (11 dígitos).")
             return
         }
 
-        val adapter = binding.spConsultas.adapter
-        if (adapter == null || adapter.count == 0 || consultasCarregadas.isEmpty()) {
-            toast("Selecione uma consulta.")
+        val pos = binding.spConsultas.selectedItemPosition
+        if (pos < 0 || consultasCarregadas.isEmpty()) {
+            toast("Selecione uma consulta para cancelar.")
             return
         }
 
         val justificativa = binding.edtJustificativa.text.toString().trim()
         if (justificativa.length < 5) {
-            toast("Informe a justificativa (mín. 5 caracteres).")
-            return
-        }
-
-        val pos = binding.spConsultas.selectedItemPosition
-        if (pos < 0 || pos >= consultasCarregadas.size) {
-            toast("Seleção inválida.")
+            toast("Informe uma justificativa válida (mínimo 5 caracteres).")
             return
         }
 
         val selecionada = consultasCarregadas[pos]
+        val idConsulta = selecionada.id
         val dataHora = selecionada.dataHoraConsulta
-        if (dataHora.isNullOrBlank()) {
-            toast("Não foi possível identificar a data/hora da consulta selecionada.")
+
+        if (idConsulta.isNullOrBlank() || dataHora.isNullOrBlank()) {
+            toast("Erro ao identificar a consulta selecionada.")
             return
         }
 
         val body = CancelarConsultaDTO(
+            idConsulta = idConsulta,   // ✅ agora envia o ID único
             cpfPaciente = cpf,
-            dataHoraConsulta = dataHora, // envia exatamente o ISO do GET
+            dataHoraConsulta = dataHora,
             justificativa = justificativa
         )
 
@@ -167,7 +176,7 @@ class CancelarConsultaAdmFragment : Fragment() {
                     Navigator.backToAdminLobby(this@CancelarConsultaAdmFragment)
                 } else {
                     val err = resp.errorBody()?.string()
-                    toast(err?.takeIf { it.isNotBlank() } ?: "Falha ao cancelar (${resp.code()}).")
+                    toast(err ?: "Erro ao cancelar (${resp.code()}).")
                 }
             } catch (t: Throwable) {
                 setLoading(false)
@@ -189,5 +198,8 @@ class CancelarConsultaAdmFragment : Fragment() {
     private fun toast(msg: String) =
         Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
 
-    override fun onDestroyView() { _binding = null; super.onDestroyView() }
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
+    }
 }
