@@ -23,6 +23,10 @@ class Consulta(
     @Column(nullable = false, length = 20)
     var status: String = "AGENDADA",
 
+    // justificativa opcional; só será preenchida quando cancelar
+    @Column(name = "justificativa_cancelamento", length = 300, nullable = true)
+    var justificativaCancelamento: String? = null,
+
     @Column(nullable = false)
     var dataCadastro: OffsetDateTime = OffsetDateTime.now(),
 

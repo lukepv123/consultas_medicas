@@ -7,5 +7,5 @@ data class CancelarConsultaDTO(
     val idConsulta: String? = null,
     val cpfPaciente: String, // UUID do paciente
     val dataHoraConsulta: String,   // ISO-8601 exatamente como veio no GET
-    val justificativa: String
+    val justificativa: String? = null
 )
