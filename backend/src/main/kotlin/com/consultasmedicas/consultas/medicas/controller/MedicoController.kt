@@ -2,17 +2,20 @@ package com.consultasmedicas.consultas.medicas.controller
 
 import com.consultasmedicas.consultas.medicas.controller.common.PageEnvelope
 import com.consultasmedicas.consultas.medicas.controller.common.toContractEnvelope
+import com.consultasmedicas.consultas.medicas.controller.dto.medicos.MedicoBasicResponseDTO
 import com.consultasmedicas.consultas.medicas.controller.dto.medicos.MedicoCreateDTO
 import com.consultasmedicas.consultas.medicas.controller.dto.medicos.MedicoResponseDTO
 import com.consultasmedicas.consultas.medicas.service.MedicoService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import java.util.UUID
 
 @RestController
 @RequestMapping("/medicos")
@@ -46,4 +49,14 @@ class MedicoController(
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, ex.message)
         }
     }
+
+
+
+    // 🔹 Novo endpoint
+    @GetMapping("/{id}/basico")
+    fun buscarBasicoPorId(@PathVariable id: UUID): ResponseEntity<MedicoBasicResponseDTO> {
+        val dto = service.buscarBasicoPorId(id)
+        return ResponseEntity.ok(dto)
+    }
+
 }

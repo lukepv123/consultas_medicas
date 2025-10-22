@@ -2,6 +2,7 @@ package com.consultasmedicas.consultas.medicas.service
 
 
 
+import com.consultasmedicas.consultas.medicas.controller.dto.medicos.MedicoBasicResponseDTO
 import com.consultasmedicas.consultas.medicas.controller.dto.medicos.MedicoCreateDTO
 import com.consultasmedicas.consultas.medicas.controller.dto.medicos.MedicoDTO
 import com.consultasmedicas.consultas.medicas.controller.dto.medicos.MedicoResponseDTO
@@ -10,6 +11,7 @@ import com.consultasmedicas.consultas.medicas.model.Especialidade
 import com.consultasmedicas.consultas.medicas.model.Medico
 import com.consultasmedicas.consultas.medicas.repository.MedicoRepository
 import com.consultasmedicas.consultas.medicas.repository.UserRepository
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -77,4 +79,22 @@ class MedicoService(
 
         return page.map { m -> MedicoMapper.toDTO(m, usersByMedico[m.id!!]) }
     }
+
+
+
+    // 🆕 NOVO MÉTODO — Buscar dados básicos do médico por ID
+    @Transactional(readOnly = true)
+    fun buscarBasicoPorId(id: UUID): MedicoBasicResponseDTO {
+        val medico = repo.findById(id)
+            .orElseThrow { EntityNotFoundException("Médico não encontrado para o ID informado") }
+
+        return MedicoBasicResponseDTO(
+            id = medico.id.toString(),
+            crm = medico.crm,
+            nome = medico.nome,
+            especialidade = medico.especialidade.name
+        )
+    }
+
+
 }
