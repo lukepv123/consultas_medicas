@@ -1,4 +1,4 @@
-package curso.petenusso.clinicsapp.api.medico.dto
+package curso.petenusso.clinicsapp.api.dto
 
 
 data class AccountDTO(

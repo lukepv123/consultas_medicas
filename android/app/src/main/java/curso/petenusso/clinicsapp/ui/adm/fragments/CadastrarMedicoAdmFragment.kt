@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import curso.petenusso.clinicsapp.R
 import curso.petenusso.clinicsapp.api.RetrofitFactory
 import curso.petenusso.clinicsapp.api.medico.MedicoApi
 import curso.petenusso.clinicsapp.core.AppResult
@@ -106,8 +107,9 @@ class CadastrarMedicoAdmFragment : Fragment() {
             else binding.edtEmail.error = null
         }
 
-        binding.edtSenha.doAfterTextChanged { validatePasswords() }
-        binding.edtRepetirSenha.doAfterTextChanged { validatePasswords() }
+
+        binding.edtSenha.doAfterTextChanged { validatePasswords(); animatePasswordIcon() }
+        binding.edtRepetirSenha.doAfterTextChanged { validatePasswords(); animatePasswordIcon() }
     }
 
     /** Validação das senhas */
@@ -202,6 +204,22 @@ class CadastrarMedicoAdmFragment : Fragment() {
         Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
 
     override fun onDestroyView() { _binding = null; super.onDestroyView() }
+
+
+
+    private fun animatePasswordIcon() = with(binding) {
+        val senha = edtSenha.text?.toString().orEmpty()
+        val repetir = edtRepetirSenha.text?.toString().orEmpty()
+
+        ivPasswordMatchStatus.visibility = if (repetir.isNotEmpty()) View.VISIBLE else View.GONE
+        if (repetir.isNotEmpty()) {
+            val icon = if (senha == repetir) R.drawable.ic_check_green else R.drawable.ic_check_red
+            ivPasswordMatchStatus.setImageResource(icon)
+            ivPasswordMatchStatus.animate().alpha(1f).setDuration(250).start()
+        }
+    }
+
+
 }
 
 /** Filtro para permitir apenas caracteres válidos conforme regex */

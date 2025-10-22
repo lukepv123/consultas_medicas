@@ -1,21 +1,21 @@
 package curso.petenusso.clinicsapp.ui.medico
 
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import curso.petenusso.clinicsapp.R
+import curso.petenusso.clinicsapp.core.Navigator
+import curso.petenusso.clinicsapp.databinding.ActivityMedicoBinding
 
 class MedicoActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMedicoBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_medico)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        binding = ActivityMedicoBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        if (savedInstanceState == null) {
+            Navigator.showMedicoLobby(this)
         }
     }
 }

@@ -23,7 +23,7 @@ class LobbyAdmFragment : Fragment() {
         binding.btnCancelarConsulta.setOnClickListener { Navigator.toAdminCancelarConsulta(this) }
         binding.btnLogout.setOnClickListener {
             SessionManager.clear()
-            Navigator.toLoginAdm(this@LobbyAdmFragment)
+            Navigator.logoutToLogin(requireContext())
         }
     }
 

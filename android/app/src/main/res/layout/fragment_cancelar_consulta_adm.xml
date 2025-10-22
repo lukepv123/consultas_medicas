@@ -19,8 +19,8 @@
             android:src="@drawable/ic_voltar" />
 
         <ImageView
-            android:layout_width="171dp"
-            android:layout_height="149dp"
+            android:layout_width="180dp"
+            android:layout_height="160dp"
             android:layout_gravity="center_horizontal"
             android:contentDescription="@null"
             android:src="@drawable/logo_android" />

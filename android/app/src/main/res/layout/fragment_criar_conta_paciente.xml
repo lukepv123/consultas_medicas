@@ -23,20 +23,19 @@
             android:layout_width="180dp"
             android:layout_height="160dp"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="8dp"
             android:src="@drawable/logo_android"
             android:contentDescription="@null" />
 
-        <!-- CRM -->
+        <!-- CPF -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="CRM"
+            android:hint="CPF"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtCrm"
+                android:id="@+id/edtCpf"
                 android:inputType="number"
                 android:minHeight="48dp"
                 android:background="@android:color/transparent"
@@ -61,7 +60,7 @@
                 android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- E-mail -->
+        <!-- Email -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -78,7 +77,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="E-mail"
+                android:hint="Email"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -162,19 +161,6 @@
                 android:src="@drawable/ic_check_red" />
         </LinearLayout>
 
-        <TextView
-            android:layout_marginTop="12dp"
-            android:text="Especialidade:"
-            android:textStyle="bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <Spinner
-            android:id="@+id/spEspecialidade"
-            android:layout_marginTop="4dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
         <ProgressBar
             android:id="@+id/progress"
             android:layout_width="wrap_content"
@@ -182,11 +168,11 @@
             android:layout_marginTop="12dp"
             android:visibility="gone" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCadastrar"
-            android:layout_marginTop="16dp"
-            android:text="Cadastrar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Cadastrar" />
     </LinearLayout>
 </ScrollView>

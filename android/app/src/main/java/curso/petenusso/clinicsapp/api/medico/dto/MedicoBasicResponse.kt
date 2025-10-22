@@ -1,9 +1,9 @@
 package curso.petenusso.clinicsapp.api.medico.dto
 
-data class MedicoDTO(
+data class MedicoBasicResponse(
+
     val id: String,
     val crm: String,
     val nome: String,
-    val especialidade: String,
-    val email: String? = null
+    val especialidade: String
 )

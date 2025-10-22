@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+   >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
+
+        <!-- Botão Voltar -->
+        <ImageView
+            android:id="@+id/btnReturn"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="start"
+            android:layout_marginBottom="8dp"
+            android:src="@drawable/ic_voltar" />
+
+        <!-- Logo -->
+        <ImageView
+            android:layout_width="160dp"
+            android:layout_height="140dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/logo_android"
+            android:contentDescription="@string/app_name" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:text="Agende sua consulta"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:layout_marginTop="24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <!-- Botão de seleção de data -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSelecionarData"
+            style="?attr/materialButtonOutlinedStyle"
+            android:text="Selecionar Data"
+            android:layout_marginTop="24dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <!-- Spinner de horários -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Horário"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:paddingStart="4dp" />
+
+        <Spinner
+            android:id="@+id/spHora"
+            android:layout_width="match_parent"
+            android:layout_height="49dp"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="?attr/colorOutlineVariant" />
+
+        <!-- Spinner de especialidade -->
+        <com.google.android.material.textview.MaterialTextView
+            android:text="Especialidade"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginTop="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <Spinner
+            android:id="@+id/spEspecialidade"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp" />
+
+        <!-- Spinner de médico -->
+        <com.google.android.material.textview.MaterialTextView
+            android:text="Médico"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginTop="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <Spinner
+            android:id="@+id/spMedico"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp" />
+
+        <!-- Botão de confirmação -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnConfirmar"
+            android:text="Confirmar Agendamento"
+            android:layout_marginTop="24dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+</ScrollView>

@@ -1,5 +1,7 @@
 package curso.petenusso.clinicsapp.api.medico.dto
 
+import curso.petenusso.clinicsapp.api.dto.AccountDTO
+
 /**
  * Corpo de criação de médico exigido pelo servidor:
  * {

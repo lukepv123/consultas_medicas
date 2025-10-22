@@ -1,5 +1,6 @@
 package curso.petenusso.clinicsapp.data.medico
 
+import curso.petenusso.clinicsapp.api.dto.AccountDTO
 import curso.petenusso.clinicsapp.api.medico.MedicoApi
 import curso.petenusso.clinicsapp.api.medico.dto.*
 import curso.petenusso.clinicsapp.core.AppResult

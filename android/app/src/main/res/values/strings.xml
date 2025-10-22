@@ -12,4 +12,31 @@
     <string name="login_activity_criar_conta_btn">Criar Conta</string>
 
 
+
+
+    //modulo medicos
+
+
+
+    //modulo pacientes
+
+    //fragment_minhas_consultas_paciente
+    <string name="fragment_minhas_consultas_paciente_btn_voltar">Voltar</string>
+    <string name="fragment_minhas_consultas_paciente_logo_app">Logo do aplicativo</string>
+    <string name="fragment_minhas_consultas_paciente_proximas_consultas">Próximas Consultas</string>
+    <string name="fragment_minhas_consultas_paciente_historico_consultas">Histórico de Consultas</string>
+    <string name="fragment_minhas_consultas_paciente_medico_placeholder">Médico: -</string>
+
+
+
+
+    //modulo adm
+
+
+    //modulo auth
+
+
+
+
+
 </resources>
