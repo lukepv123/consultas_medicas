@@ -35,4 +35,7 @@ class MedicoRepository(private val api: MedicoApi) {
     suspend fun buscar(id: String) = runCatchingResult { api.buscar(id) }
 
     suspend fun remover(id: String) = runCatchingResult { api.remover(id) }
+
+
+
 }

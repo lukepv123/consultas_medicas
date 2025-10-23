@@ -12,10 +12,7 @@
     <string name="login_activity_criar_conta_btn">Criar Conta</string>
 
 
-
-
     //modulo medicos
-
 
 
     //modulo pacientes
@@ -28,15 +25,10 @@
     <string name="fragment_minhas_consultas_paciente_medico_placeholder">Médico: -</string>
 
 
-
-
     //modulo adm
 
 
     //modulo auth
-
-
-
 
 
 </resources>

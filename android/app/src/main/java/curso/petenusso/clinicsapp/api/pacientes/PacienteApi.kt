@@ -3,6 +3,7 @@ package curso.petenusso.clinicsapp.api.pacientes
 
 import curso.petenusso.clinicsapp.api.pacientes.dto.IdResponse
 import curso.petenusso.clinicsapp.api.pacientes.dto.PacienteCreateRequest
+import curso.petenusso.clinicsapp.api.pacientes.dto.PacienteDTO
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -22,4 +23,10 @@ interface PacienteApi {
     suspend fun buscarIdPorCpf(
         @Path("cpf") cpf: String
     ): Response<IdResponse>
+
+    // 🔎 Buscar paciente por ID
+    @GET("pacientes/{id}")
+    suspend fun buscar(
+        @Path("id") id: String
+    ): Response<PacienteDTO>
 }

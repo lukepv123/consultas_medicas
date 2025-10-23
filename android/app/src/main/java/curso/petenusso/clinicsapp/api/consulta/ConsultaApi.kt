@@ -47,6 +47,14 @@ interface ConsultaApi {
     ): Response<ConsultaListResponse>
 
 
+    // 📋 Listar futuras (médico)
+    @GET("consultas/medico/{idMedico}/futuras")
+    suspend fun listarFuturasMedico(
+        @Path("idMedico") idMedico: String,
+        @Query("page") page: Int = 1,
+        @Query("per_page") perPage: Int = 20
+    ): Response<ConsultaListResponse>
+
 
 
 }
