@@ -1,14 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="24dp"
     tools:context=".ui.medico.fragments.LobbyMedicoFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+    <!-- Logo -->
+    <ImageView
+        android:id="@+id/imageLogo"
+        android:layout_width="180dp"
+        android:layout_height="160dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/logo_android"
+        android:layout_marginBottom="16dp" />
 
-</FrameLayout>
+    <!-- Título -->
+    <TextView
+        android:layout_marginTop="16dp"
+        android:text="Painel do Médico"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <!-- Label Consultas -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Consultas do Dia"
+        android:layout_marginTop="20dp"
+        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Spinner de Consultas -->
+    <Spinner
+        android:id="@+id/spinnerConsultas"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp" />
+
+    <!-- Label Paciente -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Paciente:"
+        android:layout_marginBottom="10dp"
+        android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+
+    <!-- Nome do Paciente -->
+    <TextView
+        android:id="@+id/textPaciente"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Selecione uma consulta"
+        android:textStyle="bold"
+        android:padding="8dp"
+        android:background="?attr/colorSurfaceVariant"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Botão: Ver Prontuário -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnProntuario"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ver Prontuário"
+        android:layout_marginBottom="12dp"
+        app:icon="@drawable/ic_description"
+        app:iconGravity="textStart" />
+
+    <!-- Botão: Realizar Consulta -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnRealizarConsulta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Realizar Consulta"
+        android:layout_marginBottom="12dp"
+        app:icon="@drawable/ic_medical_services"
+        app:iconGravity="textStart" />
+
+    <!-- Botão: Logout -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnLogout"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sair" />
+</LinearLayout>

@@ -24,7 +24,6 @@ interface MedicoApi {
     suspend fun remover(@Path("id") id: String)
 
 
-
     @GET("medicos")
     suspend fun listar(
         @Query("page") page: Int = 1,
