@@ -4,6 +4,6 @@ data class PacienteDTO(
     val id: String,
     val cpf: String,
     val nome: String,
-    val email: String
+    val email: String?
 
 )

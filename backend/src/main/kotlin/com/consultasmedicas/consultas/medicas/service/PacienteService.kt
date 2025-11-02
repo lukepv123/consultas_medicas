@@ -4,6 +4,7 @@ import com.consultasmedicas.consultas.medicas.controller.dto.pacientes.PacienteD
 import com.consultasmedicas.consultas.medicas.controller.dto.pacientes.PacienteResponseDTO
 import com.consultasmedicas.consultas.medicas.model.Paciente
 import com.consultasmedicas.consultas.medicas.repository.PacienteRepository
+import com.consultasmedicas.consultas.medicas.repository.UserRepository
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -14,7 +15,8 @@ import java.util.*
 @Service
 class PacienteService(
     private val repo: PacienteRepository,
-    private val account: UserAccountService
+    private val account: UserAccountService,
+    private val userRepo: UserRepository
 ) {
     @Transactional
     fun criar(req: PacienteCreateDTO, usuario: String): UUID {
@@ -39,7 +41,7 @@ class PacienteService(
     fun buscarPorId(id: UUID): PacienteResponseDTO {
         val p = repo.findById(id).orElseThrow { jakarta.persistence.EntityNotFoundException("Paciente não encontrado") }
         // buscar e-mail a partir de users (se quiser mostrar)
-        val email = p.id?.let { /* consulta leve ou projeção; pode criar um repo custom */ null }
+        val email = p.id?.let { userRepo.findEmailByPacienteId(it) }
         return PacienteResponseDTO(p.id!!, p.cpf, p.nome, email)
     }
 

@@ -14,7 +14,7 @@ interface ProntuarioApi {
 
     // ➕ Cadastrar prontuário
     @POST("prontuarios")
-    suspend fun cadastrar(
+    suspend fun criar(
         @Body body: CreateProntuarioRequest
     ): Response<ProntuarioDTO>
 
@@ -25,5 +25,9 @@ interface ProntuarioApi {
         @Query("page") page: Int = 1,
         @Query("per_page") perPage: Int = 20
     ): Response<ProntuarioListResponse>
+
+
+
+
 }
 

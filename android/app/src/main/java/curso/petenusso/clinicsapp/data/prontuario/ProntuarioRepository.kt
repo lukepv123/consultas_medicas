@@ -24,9 +24,9 @@ class ProntuarioRepository {
         }
     }
 
-    suspend fun cadastrarProntuario(body: CreateProntuarioRequest): AppResult<ProntuarioDTO> {
+    suspend fun criarProntuario(body: CreateProntuarioRequest): AppResult<ProntuarioDTO> {
         return try {
-            val response = api.cadastrar(body)
+            val response = api.criar(body)
             if (response.isSuccessful && response.body() != null) {
                 AppResult.Success(response.body()!!)
             } else {
