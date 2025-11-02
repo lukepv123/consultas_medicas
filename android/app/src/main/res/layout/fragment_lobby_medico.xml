@@ -19,7 +19,7 @@
             android:id="@+id/imageLogo"
             android:layout_width="160dp"
             android:layout_height="140dp"
-            android:contentDescription="@string/app_name"
+            android:contentDescription="@string/fragment_lobby_medico_logo_content_desc"
             android:src="@drawable/logo_android"
             android:layout_marginBottom="12dp" />
 
@@ -27,7 +27,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Painel do Médico"
+            android:text="@string/fragment_lobby_medico_title"
             android:textStyle="bold"
             android:textSize="22sp"
             android:layout_marginBottom="20dp" />
@@ -36,7 +36,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Consultas Futuras"
+            android:text="@string/fragment_lobby_medico_label_consultas"
             android:textStyle="bold"
             android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
             android:layout_marginBottom="8dp" />
@@ -54,7 +54,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Paciente:"
+            android:text="@string/fragment_lobby_medico_label_paciente"
             android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
             android:layout_marginBottom="6dp" />
 
@@ -63,7 +63,7 @@
             android:id="@+id/textPaciente"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Selecione uma consulta"
+            android:text="@string/fragment_lobby_medico_placeholder_paciente"
             android:textStyle="bold"
             android:padding="10dp"
             android:background="?attr/colorSurfaceVariant"
@@ -74,7 +74,7 @@
             android:id="@+id/btnProntuario"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Ver Prontuário"
+            android:text="@string/fragment_lobby_medico_btn_prontuario"
             android:layout_marginBottom="12dp"
             app:icon="@drawable/ic_description"
             app:iconGravity="textStart" />
@@ -84,7 +84,7 @@
             android:id="@+id/btnRealizarConsulta"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Realizar Consulta"
+            android:text="@string/fragment_lobby_medico_btn_realizar_consulta"
             android:layout_marginBottom="12dp"
             app:icon="@drawable/ic_medical_services"
             app:iconGravity="textStart" />
@@ -95,7 +95,7 @@
             style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Sair" />
+            android:text="@string/fragment_lobby_medico_btn_logout" />
 
     </LinearLayout>
 </ScrollView>

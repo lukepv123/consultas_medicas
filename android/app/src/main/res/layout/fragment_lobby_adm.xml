@@ -15,11 +15,11 @@
             android:layout_height="160dp"
             android:id="@+id/imgLogo"
             android:src="@drawable/logo_android"
-            android:contentDescription="@null" />
+            android:contentDescription="@string/fragment_lobby_adm_logo_content_desc" />
 
         <TextView
             android:layout_marginTop="16dp"
-            android:text="Painel do Administrador"
+            android:text="@string/fragment_lobby_adm_title"
             android:textStyle="bold"
             android:textSize="20sp"
             android:layout_width="wrap_content"
@@ -28,21 +28,21 @@
         <Button
             android:id="@+id/btnCancelarConsulta"
             android:layout_marginTop="24dp"
-            android:text="Cancelar uma consulta"
+            android:text="@string/fragment_lobby_adm_btn_cancelar_consulta"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
         <Button
             android:id="@+id/btnCadastrarMedico"
             android:layout_marginTop="12dp"
-            android:text="Cadastrar um médico"
+            android:text="@string/fragment_lobby_adm_btn_cadastrar_medico"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
         <Button
             android:id="@+id/btnLogout"
             android:layout_marginTop="24dp"
-            android:text="Logout"
+            android:text="@string/fragment_lobby_adm_btn_logout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 

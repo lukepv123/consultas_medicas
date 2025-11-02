@@ -26,37 +26,37 @@
             android:id="@+id/textAtendimento"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Atendimento:" />
+            android:text="@string/item_prontuario_atendimento_label" />
 
         <TextView
             android:id="@+id/textMedicacao"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Medicação:" />
+            android:text="@string/item_prontuario_medicacao_label" />
 
         <TextView
             android:id="@+id/textAlergias"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Alergias:" />
+            android:text="@string/item_prontuario_alergias_label" />
 
         <TextView
             android:id="@+id/textDeficiencia"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Deficiência:" />
+            android:text="@string/item_prontuario_deficiencia_label" />
 
         <TextView
             android:id="@+id/textComorbidade"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Comorbidade:" />
+            android:text="@string/item_prontuario_comorbidade_label" />
 
         <TextView
             android:id="@+id/textExames"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Exames:" />
+            android:text="@string/item_prontuario_exames_label" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

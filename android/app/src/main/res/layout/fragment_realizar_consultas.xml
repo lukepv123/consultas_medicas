@@ -23,6 +23,7 @@
             android:src="@drawable/ic_voltar"
             android:layout_marginTop="10dp"/>
 
+        <!-- Logo -->
         <ImageView
             android:layout_width="180dp"
             android:layout_height="160dp"
@@ -36,7 +37,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Possui alergias?">
+            android:hint="@string/fragment_realizar_consultas_hint_alergias">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/inputAlergias"
                 android:layout_width="match_parent"
@@ -46,7 +47,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Possui deficiência?">
+            android:hint="@string/fragment_realizar_consultas_hint_deficiencia">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/inputDeficiencia"
                 android:layout_width="match_parent"
@@ -56,7 +57,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Doenças pré-existentes?">
+            android:hint="@string/fragment_realizar_consultas_hint_comorbidade">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/inputComorbidade"
                 android:layout_width="match_parent"
@@ -66,7 +67,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Solicitar exames">
+            android:hint="@string/fragment_realizar_consultas_hint_exames">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/inputExames"
                 android:layout_width="match_parent"
@@ -76,7 +77,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Medicação">
+            android:hint="@string/fragment_realizar_consultas_hint_medicacao">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/inputMedicacao"
                 android:layout_width="match_parent"
@@ -86,7 +87,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Atendimento">
+            android:hint="@string/fragment_realizar_consultas_hint_atendimento">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/inputAtendimento"
                 android:layout_width="match_parent"
@@ -103,14 +104,14 @@
             android:id="@+id/btnConcluir"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Concluir Consulta"
+            android:text="@string/fragment_realizar_consultas_btn_concluir"
             app:iconGravity="textStart" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnEnviarEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Enviar Receita por E-mail"
+            android:text="@string/fragment_realizar_consultas_btn_enviar_email"
             app:icon="@drawable/ic_email"
             app:iconGravity="textStart"
             android:layout_marginTop="8dp" />

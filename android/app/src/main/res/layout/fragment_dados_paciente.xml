@@ -20,7 +20,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginStart="16dp"
             android:src="@drawable/ic_voltar"
-            android:contentDescription="@null" />
+            android:contentDescription="@string/fragment_dados_paciente_btn_voltar" />
 
         <!-- Logo -->
         <ImageView
@@ -28,7 +28,7 @@
             android:layout_height="160dp"
             android:layout_gravity="center_horizontal"
             android:src="@drawable/logo_android"
-            android:contentDescription="@null" />
+            android:contentDescription="@string/fragment_dados_paciente_logo_content_desc" />
 
         <!-- Retângulo de informações -->
         <LinearLayout
@@ -53,11 +53,11 @@
                     android:layout_marginEnd="8dp"
                     android:src="@drawable/ic_cpf"
                     app:tint="@color/colorPrimary"
-                    android:contentDescription="@null" />
+                    android:contentDescription="@string/fragment_dados_paciente_icon_cpf_desc" />
 
                 <TextView
                     android:id="@+id/tvCpf"
-                    android:text="CPF: "
+                    android:text="@string/fragment_dados_paciente_label_cpf"
                     android:textStyle="bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
@@ -77,11 +77,11 @@
                     android:layout_marginEnd="8dp"
                     android:src="@drawable/ic_user"
                     app:tint="@color/colorPrimary"
-                    android:contentDescription="@null" />
+                    android:contentDescription="@string/fragment_dados_paciente_icon_nome_desc" />
 
                 <TextView
                     android:id="@+id/tvNome"
-                    android:text="Nome: "
+                    android:text="@string/fragment_dados_paciente_label_nome"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </LinearLayout>
@@ -100,11 +100,11 @@
                     android:layout_marginEnd="8dp"
                     android:src="@drawable/ic_email"
                     app:tint="@color/colorPrimary"
-                    android:contentDescription="@null" />
+                    android:contentDescription="@string/fragment_dados_paciente_icon_email_desc" />
 
                 <TextView
                     android:id="@+id/tvEmail"
-                    android:text="Email: "
+                    android:text="@string/fragment_dados_paciente_label_email"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </LinearLayout>
