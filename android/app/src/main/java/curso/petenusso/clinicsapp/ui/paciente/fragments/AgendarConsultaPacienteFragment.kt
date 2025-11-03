@@ -12,12 +12,11 @@ import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
-import curso.petenusso.clinicsapp.api.RetrofitFactory
-import curso.petenusso.clinicsapp.api.consulta.ConsultaApi
 import curso.petenusso.clinicsapp.api.consulta.dto.CreateConsultaRequest
-import curso.petenusso.clinicsapp.api.medico.MedicoApi
-import curso.petenusso.clinicsapp.api.medico.dto.MedicoDTO
+import curso.petenusso.clinicsapp.core.AppResult
 import curso.petenusso.clinicsapp.core.Navigator
+import curso.petenusso.clinicsapp.data.consultas.ConsultaRepository
+import curso.petenusso.clinicsapp.data.medico.MedicoRepository
 import curso.petenusso.clinicsapp.databinding.FragmentAgendarConsultaPacienteBinding
 import curso.petenusso.clinicsapp.model.medico.Especialidade
 import curso.petenusso.clinicsapp.model.session.SessionManager
@@ -32,11 +31,12 @@ class AgendarConsultaPacienteFragment : Fragment() {
     private var _binding: FragmentAgendarConsultaPacienteBinding? = null
     private val binding get() = _binding!!
 
-    private val medicoApi by lazy { RetrofitFactory.retrofit().create(MedicoApi::class.java) }
-    private val consultaApi by lazy { RetrofitFactory.retrofit().create(ConsultaApi::class.java) }
+    // ✅ Substituindo Retrofit direto por repositories
+    private val medicoRepo = MedicoRepository()
+    private val consultaRepo = ConsultaRepository()
 
     private var dataSelecionada: Calendar? = null
-    private var medicoSelecionado: MedicoDTO? = null
+    private var medicoSelecionado: curso.petenusso.clinicsapp.api.medico.dto.MedicoDTO? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -124,41 +124,53 @@ class AgendarConsultaPacienteFragment : Fragment() {
     }
 
     // ======================================================
-    // 👩‍⚕️ Buscar médicos da especialidade
+    // 👩‍⚕️ Buscar médicos da especialidade (usando repository)
     // ======================================================
     private fun carregarMedicosPorEspecialidade(especialidade: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val result = medicoApi.listar(especialidade = especialidade)
-                val medicos = result.data
+                when (val result = medicoRepo.listar()) {
+                    is AppResult.Success -> {
+                        val medicosFiltrados = result.data.data.filter {
+                            it.especialidade.equals(especialidade, ignoreCase = true)
+                        }
 
-                withContext(Dispatchers.Main) {
-                    if (medicos.isEmpty()) {
-                        Snackbar.make(binding.root, "Nenhum médico encontrado para $especialidade", Snackbar.LENGTH_LONG).show()
-                        binding.spMedico.adapter = null
-                        medicoSelecionado = null
-                        return@withContext
+                        withContext(Dispatchers.Main) {
+                            if (medicosFiltrados.isEmpty()) {
+                                Snackbar.make(binding.root, "Nenhum médico encontrado para $especialidade", Snackbar.LENGTH_LONG).show()
+                                binding.spMedico.adapter = null
+                                medicoSelecionado = null
+                                return@withContext
+                            }
+
+                            val nomes = medicosFiltrados.map { "${it.nome} (${it.crm})" }
+                            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, nomes)
+                            binding.spMedico.adapter = adapter
+
+                            binding.spMedico.setOnItemSelectedListenerCompat<String> {
+                                val pos = binding.spMedico.selectedItemPosition
+                                medicoSelecionado = medicosFiltrados[pos]
+                            }
+                        }
                     }
 
-                    val nomes = medicos.map { "${it.nome} (${it.crm})" }
-                    val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, nomes)
-                    binding.spMedico.adapter = adapter
-
-                    binding.spMedico.setOnItemSelectedListenerCompat<String> {
-                        val pos = binding.spMedico.selectedItemPosition
-                        medicoSelecionado = medicos[pos]
+                    is AppResult.Error -> {
+                        withContext(Dispatchers.Main) {
+                            Snackbar.make(binding.root, "Erro ao carregar médicos: ${result.throwable.localizedMessage}", Snackbar.LENGTH_LONG).show()
+                        }
                     }
                 }
+
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Snackbar.make(binding.root, "Erro ao carregar médicos: ${e.localizedMessage}", Snackbar.LENGTH_LONG).show()
+                    Snackbar.make(binding.root, "Erro inesperado: ${e.localizedMessage}", Snackbar.LENGTH_LONG).show()
                 }
             }
         }
     }
 
     // ======================================================
-    // ✅ Confirmar agendamento
+    // ✅ Confirmar agendamento (sem mudar a lógica)
     // ======================================================
     private fun confirmarAgendamento() {
         val data = dataSelecionada
@@ -183,22 +195,28 @@ class AgendarConsultaPacienteFragment : Fragment() {
             .show()
     }
 
+    // ======================================================
+    // 📤 Cadastro da consulta (via repository)
+    // ======================================================
     private fun cadastrarConsulta(dataHora: String, idMedico: String, idPaciente: String) {
         lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val response = consultaApi.cadastrar(CreateConsultaRequest(dataHora, idMedico, idPaciente))
-                withContext(Dispatchers.Main) {
-                    when (response.code()) {
-                        201 -> Snackbar.make(binding.root, "✅ Consulta cadastrada com sucesso!", Snackbar.LENGTH_LONG).show()
-                        409 -> Snackbar.make(binding.root, "⚠️ Horário indisponível, escolha outro.", Snackbar.LENGTH_LONG).show()
-                        422 -> Snackbar.make(binding.root, "⚠️ Data/hora inválida.", Snackbar.LENGTH_LONG).show()
-                        401, 403 -> Snackbar.make(binding.root, "Sessão expirada, faça login novamente.", Snackbar.LENGTH_LONG).show()
-                        else -> Snackbar.make(binding.root, "❌ Horário ou data indisponíveis para esse médico (${response.code()})", Snackbar.LENGTH_LONG).show()
+            when (val result = consultaRepo.cadastrar(CreateConsultaRequest(dataHora, idMedico, idPaciente))) {
+                is AppResult.Success -> {
+                    withContext(Dispatchers.Main) {
+                        when (result.data) {
+                            201 -> Snackbar.make(binding.root, "✅ Consulta cadastrada com sucesso!", Snackbar.LENGTH_LONG).show()
+                            409 -> Snackbar.make(binding.root, "⚠️ Horário indisponível, escolha outro.", Snackbar.LENGTH_LONG).show()
+                            422 -> Snackbar.make(binding.root, "⚠️ Data/hora inválida.", Snackbar.LENGTH_LONG).show()
+                            401, 403 -> Snackbar.make(binding.root, "Sessão expirada, faça login novamente.", Snackbar.LENGTH_LONG).show()
+                            else -> Snackbar.make(binding.root, "❌ Horário ou data indisponíveis (${result.data})", Snackbar.LENGTH_LONG).show()
+                        }
                     }
                 }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    Snackbar.make(binding.root, "Erro ao cadastrar consulta: ${e.localizedMessage}", Snackbar.LENGTH_LONG).show()
+
+                is AppResult.Error -> {
+                    withContext(Dispatchers.Main) {
+                        Snackbar.make(binding.root, "Erro ao cadastrar consulta: ${result.throwable.localizedMessage}", Snackbar.LENGTH_LONG).show()
+                    }
                 }
             }
         }

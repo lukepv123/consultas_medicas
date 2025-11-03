@@ -11,12 +11,12 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import curso.petenusso.clinicsapp.api.RetrofitFactory
-import curso.petenusso.clinicsapp.api.consulta.ConsultaApi
 import curso.petenusso.clinicsapp.api.consulta.dto.CancelarConsultaDTO
 import curso.petenusso.clinicsapp.api.consulta.dto.ConsultaResumoDTO
-import curso.petenusso.clinicsapp.api.pacientes.PacienteApi
+import curso.petenusso.clinicsapp.core.AppResult
 import curso.petenusso.clinicsapp.core.Navigator
+import curso.petenusso.clinicsapp.data.consultas.ConsultaRepository
+import curso.petenusso.clinicsapp.data.paciente.PacienteRepository
 import curso.petenusso.clinicsapp.databinding.FragmentCancelarConsultaAdmBinding
 import kotlinx.coroutines.launch
 
@@ -24,12 +24,11 @@ class CancelarConsultaAdmFragment : Fragment() {
     private var _binding: FragmentCancelarConsultaAdmBinding? = null
     private val binding get() = _binding!!
 
-    private val pacienteApi by lazy { RetrofitFactory.retrofit().create(PacienteApi::class.java) }
-    private val consultaApi by lazy { RetrofitFactory.retrofit().create(ConsultaApi::class.java) }
+    // ✅ Agora só usa os repositórios
+    private val pacienteRepo by lazy { PacienteRepository() }
+    private val consultaRepo by lazy { ConsultaRepository() }
 
-    // cache das consultas agendadas
     private var consultasCarregadas: List<ConsultaResumoDTO> = emptyList()
-
     private val CPF_DIGITS_ONLY = Regex("^[0-9]{11}$")
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -66,50 +65,51 @@ class CancelarConsultaAdmFragment : Fragment() {
         setLoading(true)
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                // 1️⃣ Buscar o ID do paciente
-                val idResp = pacienteApi.buscarIdPorCpf(cpf)
-                if (!idResp.isSuccessful) {
-                    setLoading(false)
-                    val err = idResp.errorBody()?.string()
-                    toast(err ?: "Não foi possível obter o ID do paciente (${idResp.code()}).")
-                    return@launch
-                }
+                // 🔹 1️⃣ Buscar ID do paciente via repository
+                when (val idResult = pacienteRepo.buscarIdPorCpf(cpf)) {
+                    is AppResult.Success -> {
+                        val pacienteId = idResult.data
 
-                val pacienteId = idResp.body()?.id ?: run {
-                    setLoading(false)
-                    toast("Paciente não encontrado.")
-                    return@launch
-                }
+                        // 🔹 2️⃣ Listar consultas futuras via repository
+                        when (val resp = consultaRepo.listarFuturasPorPaciente(pacienteId)) {
+                            is AppResult.Success -> {
+                                val todas = resp.data
+                                val filtradas = todas.filter { it.status.equals("AGENDADA", ignoreCase = true) }
+                                consultasCarregadas = filtradas
 
-                // 2️⃣ Listar consultas futuras
-                val resp = consultaApi.listarFuturasPorPacienteId(pacienteId, 1, 50)
-                if (resp.isSuccessful) {
-                    val todas = resp.body()?.list().orEmpty()
-                    val filtradas = todas.filter { it.status.equals("AGENDADA", ignoreCase = true) }
-                    consultasCarregadas = filtradas
+                                if (filtradas.isEmpty()) {
+                                    setLoading(false)
+                                    binding.spConsultas.adapter = null
+                                    toast("Nenhuma consulta AGENDADA encontrada para este paciente.")
+                                    return@launch
+                                }
 
-                    if (filtradas.isEmpty()) {
+                                val itensVisuais = filtradas.map { c ->
+                                    val quando = c.dataHoraConsulta?.let(::formatIsoToLocal) ?: "—"
+                                    "$quando [AGENDADA]"
+                                }
+
+                                binding.spConsultas.adapter = ArrayAdapter(
+                                    requireContext(),
+                                    android.R.layout.simple_spinner_dropdown_item,
+                                    itensVisuais
+                                )
+                                setLoading(false)
+                            }
+
+                            is AppResult.Error -> {
+                                setLoading(false)
+                                toast("Erro ao buscar consultas (${resp.throwable.message}).")
+                            }
+                        }
+                    }
+
+                    is AppResult.Error -> {
                         setLoading(false)
-                        binding.spConsultas.adapter = null
-                        toast("Nenhuma consulta AGENDADA encontrada para este paciente.")
-                        return@launch
+                        toast(idResult.throwable.message ?: "Erro ao buscar paciente.")
                     }
-
-                    val itensVisuais = filtradas.map { c ->
-                        val quando = c.dataHoraConsulta?.let(::formatIsoToLocal) ?: "—"
-                        "$quando [AGENDADA]"
-                    }
-
-                    binding.spConsultas.adapter = ArrayAdapter(
-                        requireContext(),
-                        android.R.layout.simple_spinner_dropdown_item,
-                        itensVisuais
-                    )
-                    setLoading(false)
-                } else {
-                    setLoading(false)
-                    toast("Erro ao buscar consultas (${resp.code()}).")
                 }
+
             } catch (t: Throwable) {
                 setLoading(false)
                 toast("Erro de rede: ${t.message}")
@@ -160,7 +160,7 @@ class CancelarConsultaAdmFragment : Fragment() {
         }
 
         val body = CancelarConsultaDTO(
-            idConsulta = idConsulta,   // ✅ agora envia o ID único
+            idConsulta = idConsulta,
             cpfPaciente = cpf,
             dataHoraConsulta = dataHora,
             justificativa = justificativa
@@ -169,14 +169,13 @@ class CancelarConsultaAdmFragment : Fragment() {
         setLoading(true)
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val resp = consultaApi.cancelar(body)
+                val resp = consultaRepo.cancelar(body)
                 setLoading(false)
-                if (resp.isSuccessful) {
+                if (resp is AppResult.Success && resp.data in listOf(200, 204)) {
                     toast("Consulta cancelada com sucesso.")
                     Navigator.backToAdminLobby(this@CancelarConsultaAdmFragment)
                 } else {
-                    val err = resp.errorBody()?.string()
-                    toast(err ?: "Erro ao cancelar (${resp.code()}).")
+                    toast("Erro ao cancelar (${(resp as? AppResult.Success)?.data ?: "?"}).")
                 }
             } catch (t: Throwable) {
                 setLoading(false)

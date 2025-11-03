@@ -11,11 +11,10 @@ import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
-import curso.petenusso.clinicsapp.api.RetrofitFactory
-import curso.petenusso.clinicsapp.api.consulta.ConsultaApi
-import curso.petenusso.clinicsapp.api.medico.MedicoApi
-import curso.petenusso.clinicsapp.api.medico.dto.MedicoBasicResponse
+import curso.petenusso.clinicsapp.core.AppResult
 import curso.petenusso.clinicsapp.core.Navigator
+import curso.petenusso.clinicsapp.data.consultas.ConsultaRepository
+import curso.petenusso.clinicsapp.data.medico.MedicoRepository
 import curso.petenusso.clinicsapp.databinding.FragmentMinhasConsultasPacienteBinding
 import curso.petenusso.clinicsapp.model.session.SessionManager
 import kotlinx.coroutines.Dispatchers
@@ -31,8 +30,9 @@ class MinhasConsultasPacienteFragment : Fragment() {
     private var _binding: FragmentMinhasConsultasPacienteBinding? = null
     private val binding get() = _binding!!
 
-    private val consultaApi by lazy { RetrofitFactory.retrofit().create(ConsultaApi::class.java) }
-    private val medicoApi by lazy { RetrofitFactory.retrofit().create(MedicoApi::class.java) }
+    // ✅ Repositórios centralizados
+    private val consultaRepo = ConsultaRepository()
+    private val medicoRepo = MedicoRepository()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,6 +55,9 @@ class MinhasConsultasPacienteFragment : Fragment() {
         }
     }
 
+    // ======================================================
+    // 🔹 Carrega consultas e médicos
+    // ======================================================
     @RequiresApi(Build.VERSION_CODES.O)
     private fun carregarConsultas() {
         val paciente = SessionManager.asPaciente() ?: return
@@ -62,8 +65,18 @@ class MinhasConsultasPacienteFragment : Fragment() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val futuras = consultaApi.listarFuturas(idPaciente).body()?.data ?: emptyList()
-                val passadas = consultaApi.listarPassadas(idPaciente).body()?.data ?: emptyList()
+                // 1️⃣ Busca consultas
+                val futurasResult = consultaRepo.listarFuturas(idPaciente)
+                val passadasResult = consultaRepo.listarPassadas(idPaciente)
+
+                val futuras = if (futurasResult is AppResult.Success) futurasResult.data else emptyList()
+                val passadas = if (passadasResult is AppResult.Success) passadasResult.data else emptyList()
+
+                // 2️⃣ Busca lista de médicos uma única vez
+                val medicosResult = medicoRepo.listar()
+                val medicosMap = if (medicosResult is AppResult.Success) {
+                    medicosResult.data.data.associateBy { it.id }
+                } else emptyMap()
 
                 withContext(Dispatchers.Main) {
                     if (futuras.isEmpty() && passadas.isEmpty()) {
@@ -73,19 +86,25 @@ class MinhasConsultasPacienteFragment : Fragment() {
 
                     val formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm")
 
-                    // Preenche spinner de futuras
                     val futurasFormatadas = futuras.map {
                         val dataLocal = OffsetDateTime.parse(it.dataHoraConsulta)
                             .atZoneSameInstant(ZoneId.of("America/Sao_Paulo"))
-                        "${dataLocal.format(formatador)} (${it.status})" to it.idMedico
+                        val medico = medicosMap[it.idMedico]
+                        val nomeMedico = medico?.nome ?: "Desconhecido"
+                        val especialidade = medico?.especialidade ?: "N/A"
+                        "${dataLocal.format(formatador)} (${it.status}) — $nomeMedico ($especialidade)" to it.idMedico
                     }
 
                     val historicoFormatado = passadas.map {
                         val dataLocal = OffsetDateTime.parse(it.dataHoraConsulta)
                             .atZoneSameInstant(ZoneId.of("America/Sao_Paulo"))
-                        "${dataLocal.format(formatador)} (${it.status})" to it.idMedico
+                        val medico = medicosMap[it.idMedico]
+                        val nomeMedico = medico?.nome ?: "Desconhecido"
+                        val especialidade = medico?.especialidade ?: "N/A"
+                        "${dataLocal.format(formatador)} (${it.status}) — $nomeMedico ($especialidade)" to it.idMedico
                     }
 
+                    // 3️⃣ Preenche spinners
                     binding.spProximasConsultas.adapter = ArrayAdapter(
                         requireContext(),
                         android.R.layout.simple_spinner_dropdown_item,
@@ -98,13 +117,11 @@ class MinhasConsultasPacienteFragment : Fragment() {
                         historicoFormatado.map { it.first }
                     )
 
-                    // Listener para futuras
+                    // 4️⃣ Listeners com cache local de médicos
                     binding.spProximasConsultas.onItemSelectedListener =
-                        criarListener(futurasFormatadas, binding.tvMedicoProxima)
-
-                    // Listener para passadas
+                        criarListener(futurasFormatadas, binding.tvMedicoProxima, medicosMap)
                     binding.spHistoricoConsultas.onItemSelectedListener =
-                        criarListener(historicoFormatado, binding.tvMedicoHistorico)
+                        criarListener(historicoFormatado, binding.tvMedicoHistorico, medicosMap)
                 }
 
             } catch (e: Exception) {
@@ -115,41 +132,26 @@ class MinhasConsultasPacienteFragment : Fragment() {
         }
     }
 
+    // ======================================================
+    // 🔹 Cria listener com cache de médicos
+    // ======================================================
     private fun criarListener(
         lista: List<Pair<String, String>>,
-        label: android.widget.TextView
+        label: android.widget.TextView,
+        medicosMap: Map<String, curso.petenusso.clinicsapp.api.medico.dto.MedicoDTO>
     ): AdapterView.OnItemSelectedListener {
         return object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?, view: View?, position: Int, id: Long
-            ) {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val idMedico = lista[position].second
-                carregarDadosMedico(idMedico, label)
+                val medico = medicosMap[idMedico]
+                label.text = if (medico != null) {
+                    "👨‍⚕️ ${medico.nome} (${medico.crm}) — ${medico.especialidade.capitalize(Locale.ROOT)}"
+                } else {
+                    "Médico não encontrado"
+                }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
-    }
-
-    private fun carregarDadosMedico(idMedico: String, label: android.widget.TextView) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val response = medicoApi.buscarBasico(idMedico)
-                val medico: MedicoBasicResponse? = response.body()
-
-                withContext(Dispatchers.Main) {
-                    if (response.isSuccessful && medico != null) {
-                        label.text =
-                            "👨‍⚕️ ${medico.nome} (${medico.crm}) — ${medico.especialidade.capitalize(Locale.ROOT)}"
-                    } else {
-                        label.text = "⚠️ Médico não encontrado"
-                    }
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    label.text = "Erro ao carregar médico: ${e.localizedMessage}"
-                }
-            }
         }
     }
 

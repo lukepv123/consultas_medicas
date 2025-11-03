@@ -1,6 +1,5 @@
 package curso.petenusso.clinicsapp.data.prontuario
 
-import curso.petenusso.clinicsapp.api.RetrofitFactory
 import curso.petenusso.clinicsapp.api.prontuarios.ProntuarioApi
 import curso.petenusso.clinicsapp.api.prontuarios.dto.CreateProntuarioRequest
 import curso.petenusso.clinicsapp.api.prontuarios.dto.ProntuarioDTO
@@ -8,8 +7,7 @@ import curso.petenusso.clinicsapp.core.AppResult
 
 class ProntuarioRepository {
 
-    // ✅ Criação correta da API com RetrofitFactory.retrofit()
-    private val api = RetrofitFactory.retrofit().create(ProntuarioApi::class.java)
+    private val api = ProntuarioApi.create()
 
     suspend fun listarPorPaciente(idPaciente: String): AppResult<List<ProntuarioDTO>> {
         return try {
