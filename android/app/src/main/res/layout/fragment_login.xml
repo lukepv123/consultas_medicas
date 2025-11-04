@@ -14,14 +14,14 @@
         android:layout_height="160dp"
         android:layout_marginBottom="16dp"
         android:adjustViewBounds="true"
-        android:contentDescription="Logo da Clínica"
+        android:contentDescription="@string/fragment_login_logo_content_desc"
         android:scaleType="centerCrop"
         android:src="@drawable/logo_android" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/login_activity_bemvindo_label"
+        android:text="@string/fragment_login_bemvindo_label"
         android:textAppearance="?attr/textAppearanceHeadlineSmall"
         android:textColor="?attr/colorOnSurface"
         android:layout_marginBottom="40dp" />
@@ -30,11 +30,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
         <EditText
             android:id="@+id/edtUser"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/login_activity_email_input"
+            android:hint="@string/fragment_login_email_input"
             android:inputType="textEmailAddress|textPersonName" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -42,13 +43,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-      >
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
         <EditText
             android:id="@+id/edtPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/login_activity_senha_input"
+            android:hint="@string/fragment_login_senha_input"
             android:inputType="textPassword" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -57,7 +58,7 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginTop="32dp"
-        android:text="@string/login_activity_entrar_btn"
+        android:text="@string/fragment_login_entrar_btn"
         android:textSize="18sp"
         style="@style/Widget.Material3.Button.TonalButton" />
 
@@ -66,7 +67,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:text="@string/login_activity_criar_conta_btn"
+        android:text="@string/fragment_login_criar_conta_btn"
         android:textSize="16sp"
         android:layout_gravity="center_horizontal"
         style="@style/Widget.Material3.Button.TextButton" />
@@ -80,5 +81,4 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:indeterminateTint="?attr/colorPrimary" />
-
 </LinearLayout>

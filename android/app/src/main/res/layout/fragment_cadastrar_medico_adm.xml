@@ -17,7 +17,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="10dp"
             android:src="@drawable/ic_voltar"
-            android:contentDescription="@null" />
+            android:contentDescription="@string/fragment_cadastrar_medico_adm_btn_voltar" />
 
         <ImageView
             android:layout_width="180dp"
@@ -25,14 +25,14 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="8dp"
             android:src="@drawable/logo_android"
-            android:contentDescription="@null" />
+            android:contentDescription="@string/fragment_cadastrar_medico_adm_logo_content_desc" />
 
         <!-- CRM -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="CRM"
+            android:hint="@string/fragment_cadastrar_medico_adm_input_crm"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -49,7 +49,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="Nome"
+            android:hint="@string/fragment_cadastrar_medico_adm_input_nome"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -78,7 +78,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="E-mail"
+                android:hint="@string/fragment_cadastrar_medico_adm_input_email"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -108,7 +108,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Senha"
+                android:hint="@string/fragment_cadastrar_medico_adm_input_senha"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
                 app:endIconMode="password_toggle">
 
@@ -140,7 +140,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:hint="Confirmar senha"
+                android:hint="@string/fragment_cadastrar_medico_adm_input_confirmar_senha"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
                 app:endIconMode="password_toggle">
 
@@ -164,7 +164,7 @@
 
         <TextView
             android:layout_marginTop="12dp"
-            android:text="Especialidade:"
+            android:text="@string/fragment_cadastrar_medico_adm_label_especialidade"
             android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
@@ -185,7 +185,7 @@
         <Button
             android:id="@+id/btnCadastrar"
             android:layout_marginTop="16dp"
-            android:text="Cadastrar"
+            android:text="@string/fragment_cadastrar_medico_adm_btn_cadastrar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </LinearLayout>

@@ -15,13 +15,13 @@
             android:layout_height="160dp"
             android:id="@+id/imgLogo"
             android:src="@drawable/logo_android"
-            android:contentDescription="@null" />
+            android:contentDescription="@string/fragment_lobby_paciente_logo_content_desc" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Painel do Paciente"
+            android:text="@string/fragment_lobby_paciente_title"
             android:textStyle="bold"
             android:textSize="20sp" />
 
@@ -30,27 +30,27 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Agendar Consulta" />
+            android:text="@string/fragment_lobby_paciente_btn_agendar" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnConsultar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Minhas Consultas" />
+            android:text="@string/fragment_lobby_paciente_btn_consultar" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnDadosPessoais"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Dados Pessoais" />
+            android:text="@string/fragment_lobby_paciente_btn_dados_pessoais" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLogout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Logout" />
+            android:text="@string/fragment_lobby_paciente_btn_logout" />
     </LinearLayout>
 </ScrollView>

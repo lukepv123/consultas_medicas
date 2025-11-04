@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-   >
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,7 +19,8 @@
             android:layout_height="48dp"
             android:layout_gravity="start"
             android:layout_marginBottom="8dp"
-            android:src="@drawable/ic_voltar" />
+            android:src="@drawable/ic_voltar"
+            android:contentDescription="@string/fragment_agendar_consulta_paciente_btn_voltar" />
 
         <!-- Logo -->
         <ImageView
@@ -28,10 +28,10 @@
             android:layout_height="140dp"
             android:layout_gravity="center_horizontal"
             android:src="@drawable/logo_android"
-            android:contentDescription="@string/app_name" />
+            android:contentDescription="@string/fragment_agendar_consulta_paciente_logo_content_desc" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:text="Agende sua consulta"
+            android:text="@string/fragment_agendar_consulta_paciente_title"
             android:textStyle="bold"
             android:textSize="20sp"
             android:layout_marginTop="24dp"
@@ -42,7 +42,7 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSelecionarData"
             style="?attr/materialButtonOutlinedStyle"
-            android:text="Selecionar Data"
+            android:text="@string/fragment_agendar_consulta_paciente_btn_selecionar_data"
             android:layout_marginTop="24dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
@@ -51,7 +51,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Horário"
+            android:text="@string/fragment_agendar_consulta_paciente_label_horario"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
             android:paddingStart="4dp" />
@@ -65,7 +65,7 @@
 
         <!-- Spinner de especialidade -->
         <com.google.android.material.textview.MaterialTextView
-            android:text="Especialidade"
+            android:text="@string/fragment_agendar_consulta_paciente_label_especialidade"
             android:textStyle="bold"
             android:textSize="16sp"
             android:layout_marginTop="16dp"
@@ -80,7 +80,7 @@
 
         <!-- Spinner de médico -->
         <com.google.android.material.textview.MaterialTextView
-            android:text="Médico"
+            android:text="@string/fragment_agendar_consulta_paciente_label_medico"
             android:textStyle="bold"
             android:textSize="16sp"
             android:layout_marginTop="16dp"
@@ -96,7 +96,7 @@
         <!-- Botão de confirmação -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnConfirmar"
-            android:text="Confirmar Agendamento"
+            android:text="@string/fragment_agendar_consulta_paciente_btn_confirmar_agendamento"
             android:layout_marginTop="24dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

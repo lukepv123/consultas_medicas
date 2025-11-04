@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorSurface"
-    android:padding="16dp">
+    android:padding="16dp"
+    tools:context=".ui.paciente.fragments.MinhasConsultasPacienteFragment">
 
     <LinearLayout
         android:orientation="vertical"
@@ -13,6 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <!-- Botão Voltar -->
         <ImageView
             android:id="@+id/btnReturn"
             android:layout_width="48dp"
@@ -23,6 +26,7 @@
             android:src="@drawable/ic_voltar"
             android:layout_marginTop="10dp"/>
 
+        <!-- Logo -->
         <ImageView
             android:layout_width="180dp"
             android:layout_height="160dp"
@@ -32,6 +36,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="12dp" />
 
+        <!-- 📅 Cartão - Consultas Futuras -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -62,15 +67,14 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:paddingStart="12dp"
-                    >
+                    android:paddingStart="12dp">
 
                     <ImageView
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:src="@drawable/ic_calendario"
                         app:tint="@color/colorPrimary"
-                        android:contentDescription="Ícone de Calendário"
+                        android:contentDescription="@string/fragment_minhas_consultas_paciente_icon_calendario_desc"
                         android:layout_marginEnd="8dp" />
 
                     <Spinner
@@ -95,6 +99,7 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- 🕑 Cartão - Histórico de Consultas -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -125,15 +130,14 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:paddingStart="12dp"
-                  >
+                    android:paddingStart="12dp">
 
                     <ImageView
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:src="@drawable/ic_historico"
                         app:tint="@color/colorPrimary"
-                        android:contentDescription="Ícone de Histórico"
+                        android:contentDescription="@string/fragment_minhas_consultas_paciente_icon_historico_desc"
                         android:layout_marginEnd="8dp" />
 
                     <Spinner

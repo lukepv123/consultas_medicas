@@ -1,0 +1,134 @@
+<resources>
+    <string name="app_name">ClinicsApp</string>
+    <string name="hello_blank_fragment">Hola fragmento en blanco</string>
+
+
+    <string name="login_activity_bemvindo_label">¡Bienvenido!</string>
+    <string name="login_activity_email_input">Correo electrónico</string>
+    <string name="login_activity_senha_input">Contraseña</string>
+    <string name="login_activity_entrar_btn">Iniciar sesión</string>
+    <string name="login_activity_criar_conta_btn">Crear cuenta</string>
+
+
+    <string name="item_prontuario_atendimento_label">Atención:</string>
+    <string name="item_prontuario_medicacao_label">Medicación:</string>
+    <string name="item_prontuario_alergias_label">Alergias:</string>
+    <string name="item_prontuario_deficiencia_label">Discapacidad:</string>
+    <string name="item_prontuario_comorbidade_label">Comorbilidad:</string>
+    <string name="item_prontuario_exames_label">Exámenes:</string>
+
+
+    <string name="fragment_realizar_consultas_hint_alergias">¿Tiene alergias?</string>
+    <string name="fragment_realizar_consultas_hint_deficiencia">¿Tiene alguna discapacidad?</string>
+    <string name="fragment_realizar_consultas_hint_comorbidade">¿Enfermedades preexistentes?</string>
+    <string name="fragment_realizar_consultas_hint_exames">Solicitar exámenes</string>
+    <string name="fragment_realizar_consultas_hint_medicacao">Medicación</string>
+    <string name="fragment_realizar_consultas_hint_atendimento">Atención</string>
+    <string name="fragment_realizar_consultas_btn_concluir">Concluir Consulta</string>
+    <string name="fragment_realizar_consultas_btn_enviar_email">Enviar Receta por Correo</string>
+
+    <string name="fragment_lobby_medico_logo_content_desc">Logotipo de la aplicación</string>
+    <string name="fragment_lobby_medico_title">Panel del Médico</string>
+    <string name="fragment_lobby_medico_label_consultas">Consultas Futuras</string>
+    <string name="fragment_lobby_medico_label_paciente">Paciente:</string>
+    <string name="fragment_lobby_medico_placeholder_paciente">Seleccione una consulta</string>
+    <string name="fragment_lobby_medico_btn_prontuario">Ver Historial</string>
+    <string name="fragment_lobby_medico_btn_realizar_consulta">Realizar Consulta</string>
+    <string name="fragment_lobby_medico_btn_logout">Salir</string>
+
+
+    <string name="fragment_lobby_paciente_logo_content_desc">Logotipo de la aplicación</string>
+    <string name="fragment_lobby_paciente_title">Panel del Paciente</string>
+    <string name="fragment_lobby_paciente_btn_agendar">Agendar Consulta</string>
+    <string name="fragment_lobby_paciente_btn_consultar">Mis Consultas</string>
+    <string name="fragment_lobby_paciente_btn_dados_pessoais">Datos Personales</string>
+    <string name="fragment_lobby_paciente_btn_logout">Cerrar sesión</string>
+
+
+
+    <string name="fragment_dados_paciente_btn_voltar">Volver</string>
+    <string name="fragment_dados_paciente_logo_content_desc">Logotipo de la aplicación</string>
+    <string name="fragment_dados_paciente_icon_cpf_desc">Icono de CPF</string>
+    <string name="fragment_dados_paciente_label_cpf">CPF:</string>
+    <string name="fragment_dados_paciente_icon_nome_desc">Icono de nombre del paciente</string>
+    <string name="fragment_dados_paciente_label_nome">Nombre:</string>
+    <string name="fragment_dados_paciente_icon_email_desc">Icono de correo electrónico</string>
+    <string name="fragment_dados_paciente_label_email">Correo electrónico:</string>
+
+    <string name="fragment_cadastrar_paciente_btn_voltar">Volver</string>
+    <string name="fragment_cadastrar_paciente_logo_content_desc">Logotipo de la aplicación</string>
+    <string name="fragment_cadastrar_paciente_input_cpf">CPF</string>
+    <string name="fragment_cadastrar_paciente_input_nome">Nombre</string>
+    <string name="fragment_cadastrar_paciente_input_email">Correo electrónico</string>
+    <string name="fragment_cadastrar_paciente_input_senha">Contraseña</string>
+    <string name="fragment_cadastrar_paciente_input_confirmar_senha">Confirmar contraseña</string>
+    <string name="fragment_cadastrar_paciente_btn_cadastrar">Registrarse</string>
+
+
+    <string name="fragment_agendar_consulta_paciente_btn_voltar">Volver</string>
+    <string name="fragment_agendar_consulta_paciente_logo_content_desc">Logotipo de la aplicación</string>
+    <string name="fragment_agendar_consulta_paciente_title">Agende su consulta</string>
+    <string name="fragment_agendar_consulta_paciente_btn_selecionar_data">Seleccionar Fecha</string>
+    <string name="fragment_agendar_consulta_paciente_label_horario">Horario</string>
+    <string name="fragment_agendar_consulta_paciente_label_especialidade">Especialidad</string>
+    <string name="fragment_agendar_consulta_paciente_label_medico">Médico</string>
+    <string name="fragment_agendar_consulta_paciente_btn_confirmar_agendamento">Confirmar Cita</string>
+
+
+    <string name="fragment_minhas_consultas_paciente_btn_voltar">Volver</string>
+    <string name="fragment_minhas_consultas_paciente_logo_app">Logotipo de la aplicación</string>
+    <string name="fragment_minhas_consultas_paciente_proximas_consultas">Próximas Consultas</string>
+    <string name="fragment_minhas_consultas_paciente_historico_consultas">Historial de Consultas</string>
+    <string name="fragment_minhas_consultas_paciente_medico_placeholder">Médico: -</string>
+    <string name="fragment_minhas_consultas_paciente_icon_calendario_desc">Icono de calendario</string>
+    <string name="fragment_minhas_consultas_paciente_icon_historico_desc">Icono de historial</string>
+
+
+
+    <string name="fragment_admin_registration_input_email">Correo electrónico del administrador</string>
+    <string name="fragment_admin_registration_input_password">Contraseña (mínimo 8)</string>
+    <string name="fragment_admin_registration_input_confirm_password">Confirmar contraseña</string>
+    <string name="fragment_admin_registration_btn_register">Registrar</string>
+
+    <string name="fragment_lobby_adm_logo_content_desc">Logotipo de la aplicación</string>
+    <string name="fragment_lobby_adm_title">Panel del Administrador</string>
+    <string name="fragment_lobby_adm_btn_cancelar_consulta">Cancelar una consulta</string>
+    <string name="fragment_lobby_adm_btn_cadastrar_medico">Registrar un médico</string>
+    <string name="fragment_lobby_adm_btn_logout">Cerrar sesión</string>
+
+    <string name="fragment_cancelar_consulta_adm_btn_voltar">Volver</string>
+    <string name="fragment_cancelar_consulta_adm_logo_content_desc">Logotipo de la aplicación</string>
+    <string name="fragment_cancelar_consulta_adm_input_cpf">CPF del paciente</string>
+    <string name="fragment_cancelar_consulta_adm_btn_buscar_consultas">Buscar consultas del paciente</string>
+    <string name="fragment_cancelar_consulta_adm_input_justificativa">Justificación</string>
+    <string name="fragment_cancelar_consulta_adm_btn_cancelar_consulta">Cancelar consulta</string>
+
+
+    <string name="fragment_cadastrar_medico_adm_btn_voltar">Volver</string>
+    <string name="fragment_cadastrar_medico_adm_logo_content_desc">Logotipo de la aplicación</string>
+    <string name="fragment_cadastrar_medico_adm_input_crm">CRM</string>
+    <string name="fragment_cadastrar_medico_adm_input_nome">Nombre</string>
+    <string name="fragment_cadastrar_medico_adm_input_email">Correo electrónico</string>
+    <string name="fragment_cadastrar_medico_adm_input_senha">Contraseña</string>
+    <string name="fragment_cadastrar_medico_adm_input_confirmar_senha">Confirmar contraseña</string>
+    <string name="fragment_cadastrar_medico_adm_label_especialidade">Especialidad:</string>
+    <string name="fragment_cadastrar_medico_adm_btn_cadastrar">Registrar</string>
+
+
+    <string name="fragment_login_logo_content_desc">Logotipo de la Clínica</string>
+    <string name="fragment_login_bemvindo_label">¡Bienvenido!</string>
+    <string name="fragment_login_email_input">Correo electrónico</string>
+    <string name="fragment_login_senha_input">Contraseña</string>
+    <string name="fragment_login_entrar_btn">Iniciar sesión</string>
+    <string name="fragment_login_criar_conta_btn">Crear cuenta</string>
+
+    <string name="fragment_boas_vindas_logo_desc">Logotipo de Clinics</string>
+    <string name="fragment_boas_vindas_titulo">¡Bienvenido(a) a Clinics!</string>
+    <string name="fragment_boas_vindas_subtitulo">¿Primera vez? Vamos a configurar sus primeros pasos.</string>
+    <string name="fragment_boas_vindas_passo1">1. Defina un(a) administrador(a).</string>
+    <string name="fragment_boas_vindas_passo2">2. Registre a sus médicos.</string>
+    <string name="fragment_boas_vindas_passo3">3. ¡Comience a registrar a sus pacientes!</string>
+    <string name="fragment_boas_vindas_btn_comecar">Comenzar Configuración</string>
+
+
+</resources>
