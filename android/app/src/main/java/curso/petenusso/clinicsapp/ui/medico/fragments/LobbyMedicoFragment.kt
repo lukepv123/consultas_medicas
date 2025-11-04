@@ -1,17 +1,17 @@
 package curso.petenusso.clinicsapp.ui.medico.fragments
 
+import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
+import android.util.Log
+import android.view.*
+import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import curso.petenusso.clinicsapp.R
 import curso.petenusso.clinicsapp.api.RetrofitFactory
 import curso.petenusso.clinicsapp.api.consulta.ConsultaApi
+import curso.petenusso.clinicsapp.api.pacientes.PacienteApi
 import curso.petenusso.clinicsapp.core.AppResult
 import curso.petenusso.clinicsapp.core.Navigator
 import curso.petenusso.clinicsapp.data.paciente.PacienteRepository
@@ -20,23 +20,25 @@ import curso.petenusso.clinicsapp.databinding.FragmentLobbyMedicoBinding
 import curso.petenusso.clinicsapp.model.prontuario.Prontuario
 import curso.petenusso.clinicsapp.model.session.SessionManager
 import curso.petenusso.clinicsapp.ui.medico.dialogs.ProntuarioDialogFragment
-import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.*
+import kotlinx.coroutines.*
+import java.time.*
+import java.time.format.DateTimeFormatter
 
 class LobbyMedicoFragment : Fragment() {
 
     private var _binding: FragmentLobbyMedicoBinding? = null
     private val binding get() = _binding!!
 
-    // APIs diretas e repositórios existentes
+    // ====================================================
+    // 🔹 APIS / REPOSITORIES
+    // ====================================================
     private val consultaApi = RetrofitFactory.retrofit().create(ConsultaApi::class.java)
+    private val pacienteApi = RetrofitFactory.retrofit().create(PacienteApi::class.java)
     private val pacienteRepo = PacienteRepository()
     private val prontuarioRepo = ProntuarioRepository()
 
-    private val consultas = mutableListOf<Pair<String, ConsultaItem>>() // (textoExibido, consulta)
+    private val consultas = mutableListOf<Pair<String, ConsultaItem>>()
     private var consultaSelecionada: ConsultaItem? = null
-    private var nomePacienteSelecionado: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,58 +48,88 @@ class LobbyMedicoFragment : Fragment() {
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        carregarConsultasDoDia()
         setupButtons()
+        carregarConsultasDoMedico()
     }
 
     // ====================================================
-    // 🔹 CONSULTAS DO MÉDICO LOGADO (usa ConsultaApi diretamente)
+    // 🔹 CONSULTAS DO MÉDICO LOGADO
     // ====================================================
-    private fun carregarConsultasDoDia() {
-        val medicoId = SessionManager.current?.userId ?: return
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun carregarConsultasDoMedico() {
+        val medicoSessao = SessionManager.asMedico()
+        val medicoId = medicoSessao?.medicoId ?: medicoSessao?.userId
 
-        lifecycleScope.launch {
+        if (medicoId.isNullOrBlank()) {
+            lifecycleScope.launch(Dispatchers.Main) {
+                binding.textPaciente.text = "Erro: ID do médico não encontrado na sessão."
+            }
+            return
+        }
+
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
-                binding.textPaciente.text = "Carregando consultas..."
-                binding.spinnerConsultas.isEnabled = false
+                withContext(Dispatchers.Main) {
+                    binding.textPaciente.text = "Carregando consultas..."
+                    binding.spinnerConsultas.isEnabled = false
+                }
 
-                val response = consultaApi.listarFuturasMedico(medicoId)
-                if (response.isSuccessful && response.body() != null) {
-                    val lista = response.body()!!.data
+                Log.d("LobbyMedico", "🔹 Requisição: medicoId=$medicoId, email=${medicoSessao?.emailOrUser}")
 
-                    if (lista.isEmpty()) {
-                        binding.textPaciente.text = "Nenhuma consulta agendada para hoje."
-                        return@launch
+                val response = consultaApi.listarFuturasMedico(medicoId, page = 1, perPage = 10)
+
+                if (!response.isSuccessful || response.body() == null) {
+                    withContext(Dispatchers.Main) {
+                        binding.textPaciente.text =
+                            "Erro ao buscar consultas: ${response.code()} - ${response.message()}"
+                    }
+                    return@launch
+                }
+
+                val lista = response.body()?.list() ?: emptyList()
+                Log.d("LobbyMedico", "✅ Consultas recebidas: ${lista.size}")
+
+                if (lista.isEmpty()) {
+                    withContext(Dispatchers.Main) {
+                        binding.textPaciente.text = "Nenhuma consulta futura encontrada."
+                    }
+                    return@launch
+                }
+
+                consultas.clear()
+                val fuso = ZoneId.of("America/Sao_Paulo")
+                val formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm")
+
+                lista.sortedBy { it.dataHoraConsulta }.forEach { consulta ->
+                    val texto = try {
+                        val instante = Instant.parse(consulta.dataHoraConsulta)
+                        val dataLocal = ZonedDateTime.ofInstant(instante, fuso)
+                        "${dataLocal.format(formatador)} — Paciente ${consulta.idPaciente.take(6)}..."
+                    } catch (e: Exception) {
+                        "Data inválida — Paciente ${consulta.idPaciente.take(6)}..."
                     }
 
-                    consultas.clear()
-
-                    val formatoEntrada = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-                    val formatoSaida = SimpleDateFormat("HH:mm", Locale.getDefault())
-
-                    for (consulta in lista) {
-                        val dataHora = try {
-                            formatoEntrada.parse(consulta.dataHoraConsulta)
-                        } catch (_: Exception) {
-                            null
-                        }
-                        val hora = dataHora?.let { formatoSaida.format(it) } ?: "?"
-                        consultas.add(
-                            "$hora - Paciente ${consulta.idPaciente.take(6)}..." to
-                                    ConsultaItem(consulta.id, consulta.idPaciente, consulta.dataHoraConsulta)
+                    consultas.add(
+                        texto to ConsultaItem(
+                            id = consulta.id,
+                            idPaciente = consulta.idPaciente,
+                            dataHoraConsulta = consulta.dataHoraConsulta
                         )
-                    }
+                    )
+                }
 
+                withContext(Dispatchers.Main) {
                     val adapter = ArrayAdapter(
                         requireContext(),
-                        android.R.layout.simple_spinner_item,
+                        android.R.layout.simple_spinner_dropdown_item,
                         consultas.map { it.first }
                     )
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                     binding.spinnerConsultas.adapter = adapter
                     binding.spinnerConsultas.isEnabled = true
+                    binding.textPaciente.text = "Selecione uma consulta"
 
                     binding.spinnerConsultas.onItemSelectedListener =
                         object : AdapterView.OnItemSelectedListener {
@@ -112,41 +144,64 @@ class LobbyMedicoFragment : Fragment() {
                             }
 
                             override fun onNothingSelected(parent: AdapterView<*>?) {
-                                consultaSelecionada = null
                                 binding.textPaciente.text = "Selecione uma consulta"
                             }
                         }
-                } else {
-                    binding.textPaciente.text =
-                        "Erro ao buscar consultas: ${response.code()} - ${response.message()}"
+
+                    Toast.makeText(
+                        requireContext(),
+                        "Consultas carregadas: ${consultas.size}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
+
             } catch (e: Exception) {
-                binding.textPaciente.text = "Erro: ${e.message}"
+                Log.e("LobbyMedico", "❌ Erro ao carregar consultas", e)
+                withContext(Dispatchers.Main) {
+                    binding.textPaciente.text = "Erro: ${e.localizedMessage}"
+                }
             }
         }
     }
 
     // ====================================================
-    // 🔹 BUSCAR NOME DO PACIENTE PELO ID
+    // 🔹 BUSCAR NOME DO PACIENTE
     // ====================================================
     private fun buscarNomePaciente(idPaciente: String) {
-        lifecycleScope.launch {
-            binding.textPaciente.text = "Buscando paciente..."
-            when (val result = pacienteRepo.buscarPaciente(idPaciente)) {
-                is AppResult.Success -> {
-                    val paciente = result.data
-                    nomePacienteSelecionado = paciente.nome
-                    binding.textPaciente.text = paciente.nome
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                withContext(Dispatchers.Main) {
+                    binding.textPaciente.text = "Buscando paciente..."
                 }
-                is AppResult.Error -> {
-                    binding.textPaciente.text = "Erro: ${result.throwable.message}"
+
+                val result = pacienteRepo.buscarPaciente(idPaciente)
+
+                withContext(Dispatchers.Main) {
+                    when (result) {
+                        is AppResult.Success -> {
+                            val nome = result.data.nome ?: "Paciente sem nome"
+                            Log.d("LobbyMedico", "✅ Paciente encontrado: $nome")
+                            binding.textPaciente.text = nome
+                        }
+
+                        is AppResult.Error -> {
+                            Log.e("LobbyMedico", "❌ Erro paciente: ${result.throwable.message}")
+                            binding.textPaciente.text =
+                                "Erro ao buscar paciente: ${result.throwable.message}"
+                        }
+                    }
                 }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    binding.textPaciente.text = "Erro: ${e.localizedMessage}"
+                }
+                Log.e("LobbyMedico", "❌ Exceção ao buscar paciente", e)
             }
         }
     }
 
     // ====================================================
-    // 🔹 BUSCAR E EXIBIR PRONTUÁRIOS DO PACIENTE
+    // 🔹 EXIBIR PRONTUÁRIOS
     // ====================================================
     private fun showProntuarioDialog() {
         val pacienteId = consultaSelecionada?.idPaciente ?: return
@@ -161,23 +216,36 @@ class LobbyMedicoFragment : Fragment() {
                             .setPositiveButton("Voltar", null)
                             .show()
                     } else {
-                        val prontuarios = result.data.map {
+                        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm")
+                        val zone = ZoneId.of("America/Sao_Paulo")
+
+                        val prontuariosFormatados = result.data.map { dto ->
+                            val dataFormatada = try {
+                                val instant = Instant.parse(dto.dataCadastro)
+                                val local = ZonedDateTime.ofInstant(instant, zone)
+                                local.format(formatter)
+                            } catch (e: Exception) {
+                                dto.dataCadastro
+                            }
+
                             Prontuario(
-                                id = it.id,
-                                idPaciente = it.idPaciente,
-                                atendimento = it.atendimento,
-                                alergias = it.alergias ?: "",
-                                deficiencia = it.deficiencia ?: "",
-                                comorbidade = it.comorbidade ?: "",
-                                exames = it.exames ?: "",
-                                medicacao = it.medicacao ?: "",
-                                dataCadastro = it.dataCadastro
+                                id = dto.id,
+                                idPaciente = dto.idPaciente,
+                                atendimento = dto.atendimento,
+                                alergias = dto.alergias ?: "",
+                                deficiencia = dto.deficiencia ?: "",
+                                comorbidade = dto.comorbidade ?: "",
+                                exames = dto.exames ?: "",
+                                medicacao = dto.medicacao ?: "",
+                                dataCadastro = dataFormatada
                             )
                         }
-                        ProntuarioDialogFragment(prontuarios)
+
+                        ProntuarioDialogFragment(prontuariosFormatados)
                             .show(parentFragmentManager, "dialogProntuario")
                     }
                 }
+
                 is AppResult.Error -> {
                     MaterialAlertDialogBuilder(requireContext())
                         .setTitle("Erro")
@@ -192,28 +260,36 @@ class LobbyMedicoFragment : Fragment() {
     // ====================================================
     // 🔹 BOTÕES
     // ====================================================
-    private fun setupButtons() {
-        binding.btnProntuario.setOnClickListener {
+    private fun setupButtons() = with(binding) {
+        btnProntuario.setOnClickListener {
             if (consultaSelecionada == null) {
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Atenção")
                     .setMessage("Selecione uma consulta primeiro.")
                     .setPositiveButton("OK", null)
                     .show()
-            } else {
-                showProntuarioDialog()
+            } else showProntuarioDialog()
+        }
+
+        btnRealizarConsulta.setOnClickListener {
+            if (consultaSelecionada == null) {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Atenção")
+                    .setMessage("Selecione uma consulta para continuar.")
+                    .setPositiveButton("OK", null)
+                    .show()
+                return@setOnClickListener
             }
+
+            val pacienteId = consultaSelecionada!!.idPaciente
+            val consultaId = consultaSelecionada!!.id
+            Log.d("LobbyMedico", "➡️ Iniciando consulta para pacienteId=$pacienteId")
+
+            // ✅ Navegação centralizada via Navigator
+            Navigator.toRealizarConsulta(this@LobbyMedicoFragment, pacienteId, consultaId)
         }
 
-        binding.btnRealizarConsulta.setOnClickListener {
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Abrir consulta")
-                .setMessage("Aqui abrirá o fragmento de realização da consulta.")
-                .setPositiveButton("OK", null)
-                .show()
-        }
-
-        binding.btnLogout.setOnClickListener {
+        btnLogout.setOnClickListener {
             SessionManager.clear()
             Navigator.logoutToLogin(requireContext())
         }
@@ -224,9 +300,6 @@ class LobbyMedicoFragment : Fragment() {
         _binding = null
     }
 
-    // ====================================================
-    // 🔹 DATA CLASS LOCAL
-    // ====================================================
     data class ConsultaItem(
         val id: String,
         val idPaciente: String,

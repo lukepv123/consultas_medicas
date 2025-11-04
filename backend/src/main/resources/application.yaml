@@ -16,16 +16,20 @@ spring:
       max-lifetime: 1800000
 
   jpa:
-
     show-sql: true
     open-in-view: false
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
-
         format_sql: true
-        jdbc.time_zone: America/Sao_Paulo
+        # 🔹 Padroniza o Hibernate e o JDBC para UTC
+        jdbc.time_zone: UTC
+
+  jackson:
+    # 🔹 Faz com que toda serialização/deserialização JSON use UTC
+    time-zone: UTC
+    date-format: yyyy-MM-dd'T'HH:mm:ssXXX
 
   data:
     web:

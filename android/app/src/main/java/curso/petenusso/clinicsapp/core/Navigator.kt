@@ -3,6 +3,7 @@ package curso.petenusso.clinicsapp.core
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -154,6 +155,28 @@ object Navigator {
 
     fun showMedicoLobby(activity: AppCompatActivity) {
         replaceFragment(activity, MEDICO_CONTAINER_ID, LobbyMedicoFragment(), addToBackStack = false)
+    }
+
+
+    // ✅ Navegar para o fragmento de realização de consulta
+    fun toRealizarConsulta(host: Fragment, pacienteId: String, consultaId: String) {
+        val fragment = curso.petenusso.clinicsapp.ui.medico.fragments.RealizarConsultasFragment().apply {
+            arguments = Bundle().apply {
+                putString("paciente_id", pacienteId)
+                putString("consulta_id", consultaId)
+            }
+        }
+
+        replaceFragment(
+            host.requireActivity() as AppCompatActivity,
+            MEDICO_CONTAINER_ID,
+            fragment
+        )
+    }
+
+
+    fun backToMedicoLobby(host: Fragment) {
+        replaceFragment(host.requireActivity() as AppCompatActivity, MEDICO_CONTAINER_ID, LobbyMedicoFragment(), addToBackStack = false)
     }
 
 

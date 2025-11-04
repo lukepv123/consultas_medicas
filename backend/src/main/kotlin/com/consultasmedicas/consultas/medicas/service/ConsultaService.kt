@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.*
 
 @Service
@@ -105,10 +106,9 @@ class ConsultaService(
 
     @Transactional(readOnly = true)
     fun listarFuturasMedico(idMedico: UUID, page: Int, perPage: Int): Page<Consulta> {
-        val pageable: Pageable = PageRequest.of(page - 1, perPage)
-        return repo.findByIdMedicoAndDataHoraConsultaAfterOrderByDataHoraConsultaAsc(
-            idMedico, OffsetDateTime.now(), pageable
-        )
+        val pageable = PageRequest.of(page - 1, perPage)
+        val agoraUtc = OffsetDateTime.now(ZoneOffset.UTC)
+        return repo.findByIdMedicoAndDataHoraConsultaAfterOrderByDataHoraConsultaAsc(idMedico, agoraUtc, pageable)
     }
 
     fun toResponse(c: Consulta) = ConsultaResponseDTO(

@@ -4,6 +4,7 @@ package com.consultasmedicas.consultas.medicas.repository
 import com.consultasmedicas.consultas.medicas.model.User
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import java.util.*
 
 interface UserRepository : JpaRepository<User, UUID> {
@@ -26,5 +27,12 @@ interface UserRepository : JpaRepository<User, UUID> {
 """)
     fun findByUsernameWithLinks(username: String): User?
 
+
+    @Query("""
+        select u.username 
+          from User u 
+         where u.paciente.id = :pacienteId
+    """)
+    fun findEmailByPacienteId(@Param("pacienteId") pacienteId: UUID): String?
 
 }
