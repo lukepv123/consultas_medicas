@@ -11,12 +11,11 @@ import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.button.MaterialButton
 import curso.petenusso.clinicsapp.R
-import curso.petenusso.clinicsapp.api.RetrofitFactory
 import curso.petenusso.clinicsapp.api.dto.AccountDTO
-import curso.petenusso.clinicsapp.api.pacientes.PacienteApi
 import curso.petenusso.clinicsapp.api.pacientes.dto.PacienteCreateRequest
+import curso.petenusso.clinicsapp.core.AppResult
+import curso.petenusso.clinicsapp.data.paciente.PacienteRepository
 import curso.petenusso.clinicsapp.databinding.FragmentCriarContaPacienteBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,9 +26,8 @@ class CriarContaPacienteFragment : Fragment() {
     private var _binding: FragmentCriarContaPacienteBinding? = null
     private val binding get() = _binding!!
 
-    private val pacienteApi by lazy {
-        RetrofitFactory.retrofit().create(PacienteApi::class.java)
-    }
+    // ✅ Agora usa apenas o repository
+    private val pacienteRepo by lazy { PacienteRepository() }
 
     // ---------- Regras ----------
     private companion object Rules {
@@ -64,7 +62,7 @@ class CriarContaPacienteFragment : Fragment() {
         }
 
         binding.btnCadastrar.setOnClickListener {
-            cadastrar()
+            cadastrarPaciente()
         }
     }
 
@@ -161,43 +159,36 @@ class CriarContaPacienteFragment : Fragment() {
     }
 
     // ============================================================
-    // ================ REQUISIÇÃO API ============================
+    // ================ REQUISIÇÃO CENTRALIZADA ===================
     // ============================================================
-    private fun cadastrar() {
-        with(binding) {
-            if (!validateAll()) return
+    private fun cadastrarPaciente() = with(binding) {
+        if (!validateAll()) return@with
 
-            val dto = PacienteCreateRequest(
-                cpf = edtCpf.text.toString().trim(),
-                nome = edtNome.text.toString().trim(),
-                account = AccountDTO(
-                    email = edtEmail.text.toString().trim().lowercase(),
-                    senha = edtSenha.text.toString().trim()
-                )
+        val dto = PacienteCreateRequest(
+            cpf = edtCpf.text.toString().trim(),
+            nome = edtNome.text.toString().trim(),
+            account = AccountDTO(
+                email = edtEmail.text.toString().trim().lowercase(),
+                senha = edtSenha.text.toString().trim()
             )
+        )
 
-            setLoading(true)
-            lifecycleScope.launch(Dispatchers.IO) {
-                try {
-                    val response = pacienteApi.cadastrarPaciente(dto)
-                    withContext(Dispatchers.Main) {
-                        setLoading(false)
-                        when (response.code()) {
-                            201 -> {
-                                toast("Cadastro realizado com sucesso!")
-                                requireActivity().onBackPressedDispatcher.onBackPressed()
-                            }
-                            else -> {
-                                val errorBody = response.errorBody()?.string() ?: "Erro desconhecido"
-                                toast("❌ Erro ao cadastrar")
-                                println("Erro: $errorBody")
-                            }
+        setLoading(true)
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            val result = pacienteRepo.cadastrar(dto)
+            withContext(Dispatchers.Main) {
+                setLoading(false)
+                when (result) {
+                    is AppResult.Success -> {
+                        if (result.data == 201) {
+                            toast("Cadastro realizado com sucesso!")
+                            requireActivity().onBackPressedDispatcher.onBackPressed()
+                        } else {
+                            toast("Erro ao cadastrar (${result.data})")
                         }
                     }
-                } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        setLoading(false)
-                        toast("Erro de conexão: ${e.localizedMessage ?: e.message}")
+                    is AppResult.Error -> {
+                        toast("Erro: ${result.throwable.message ?: "Falha na requisição"}")
                     }
                 }
             }
@@ -232,11 +223,9 @@ class CriarContaPacienteFragment : Fragment() {
             ivPasswordMatchStatus.animate().alpha(1f).setDuration(250).start()
         }
     }
-
-
 }
 
-/** Filtro genérico para restringir caracteres via Regex */
+/** 🔹 Filtro genérico para restringir caracteres via Regex */
 class RegexAllowFilter(private val regex: Regex) : InputFilter {
     override fun filter(
         source: CharSequence?, start: Int, end: Int,

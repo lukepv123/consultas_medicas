@@ -9,11 +9,9 @@ import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import curso.petenusso.clinicsapp.api.RetrofitFactory
-import curso.petenusso.clinicsapp.api.consulta.ConsultaApi
-import curso.petenusso.clinicsapp.api.pacientes.PacienteApi
 import curso.petenusso.clinicsapp.core.AppResult
 import curso.petenusso.clinicsapp.core.Navigator
+import curso.petenusso.clinicsapp.data.consultas.ConsultaRepository
 import curso.petenusso.clinicsapp.data.paciente.PacienteRepository
 import curso.petenusso.clinicsapp.data.prontuario.ProntuarioRepository
 import curso.petenusso.clinicsapp.databinding.FragmentLobbyMedicoBinding
@@ -30,10 +28,9 @@ class LobbyMedicoFragment : Fragment() {
     private val binding get() = _binding!!
 
     // ====================================================
-    // 🔹 APIS / REPOSITORIES
+    // 🔹 REPOSITORIES (sem Retrofit direto)
     // ====================================================
-    private val consultaApi = RetrofitFactory.retrofit().create(ConsultaApi::class.java)
-    private val pacienteApi = RetrofitFactory.retrofit().create(PacienteApi::class.java)
+    private val consultaRepo = ConsultaRepository()
     private val pacienteRepo = PacienteRepository()
     private val prontuarioRepo = ProntuarioRepository()
 
@@ -79,80 +76,84 @@ class LobbyMedicoFragment : Fragment() {
 
                 Log.d("LobbyMedico", "🔹 Requisição: medicoId=$medicoId, email=${medicoSessao?.emailOrUser}")
 
-                val response = consultaApi.listarFuturasMedico(medicoId, page = 1, perPage = 10)
+                // ✅ Agora usa o repository (mesma lógica de resposta)
+                val result = consultaRepo.listarFuturasMedico(medicoId)
 
-                if (!response.isSuccessful || response.body() == null) {
-                    withContext(Dispatchers.Main) {
-                        binding.textPaciente.text =
-                            "Erro ao buscar consultas: ${response.code()} - ${response.message()}"
-                    }
-                    return@launch
-                }
+                when (result) {
+                    is AppResult.Success -> {
+                        val lista = result.data
+                        Log.d("LobbyMedico", "✅ Consultas recebidas: ${lista.size}")
 
-                val lista = response.body()?.list() ?: emptyList()
-                Log.d("LobbyMedico", "✅ Consultas recebidas: ${lista.size}")
-
-                if (lista.isEmpty()) {
-                    withContext(Dispatchers.Main) {
-                        binding.textPaciente.text = "Nenhuma consulta futura encontrada."
-                    }
-                    return@launch
-                }
-
-                consultas.clear()
-                val fuso = ZoneId.of("America/Sao_Paulo")
-                val formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm")
-
-                lista.sortedBy { it.dataHoraConsulta }.forEach { consulta ->
-                    val texto = try {
-                        val instante = Instant.parse(consulta.dataHoraConsulta)
-                        val dataLocal = ZonedDateTime.ofInstant(instante, fuso)
-                        "${dataLocal.format(formatador)} — Paciente ${consulta.idPaciente.take(6)}..."
-                    } catch (e: Exception) {
-                        "Data inválida — Paciente ${consulta.idPaciente.take(6)}..."
-                    }
-
-                    consultas.add(
-                        texto to ConsultaItem(
-                            id = consulta.id,
-                            idPaciente = consulta.idPaciente,
-                            dataHoraConsulta = consulta.dataHoraConsulta
-                        )
-                    )
-                }
-
-                withContext(Dispatchers.Main) {
-                    val adapter = ArrayAdapter(
-                        requireContext(),
-                        android.R.layout.simple_spinner_dropdown_item,
-                        consultas.map { it.first }
-                    )
-                    binding.spinnerConsultas.adapter = adapter
-                    binding.spinnerConsultas.isEnabled = true
-                    binding.textPaciente.text = "Selecione uma consulta"
-
-                    binding.spinnerConsultas.onItemSelectedListener =
-                        object : AdapterView.OnItemSelectedListener {
-                            override fun onItemSelected(
-                                parent: AdapterView<*>?,
-                                view: View?,
-                                position: Int,
-                                id: Long
-                            ) {
-                                consultaSelecionada = consultas[position].second
-                                buscarNomePaciente(consultaSelecionada!!.idPaciente)
+                        if (lista.isEmpty()) {
+                            withContext(Dispatchers.Main) {
+                                binding.textPaciente.text = "Nenhuma consulta futura encontrada."
                             }
-
-                            override fun onNothingSelected(parent: AdapterView<*>?) {
-                                binding.textPaciente.text = "Selecione uma consulta"
-                            }
+                            return@launch
                         }
 
-                    Toast.makeText(
-                        requireContext(),
-                        "Consultas carregadas: ${consultas.size}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                        consultas.clear()
+                        val fuso = ZoneId.of("America/Sao_Paulo")
+                        val formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm")
+
+                        lista.sortedBy { it.dataHoraConsulta }.forEach { consulta ->
+                            val texto = try {
+                                val instante = Instant.parse(consulta.dataHoraConsulta)
+                                val dataLocal = ZonedDateTime.ofInstant(instante, fuso)
+                                "${dataLocal.format(formatador)} — Paciente ${consulta.idPaciente.take(6)}..."
+                            } catch (e: Exception) {
+                                "Data inválida — Paciente ${consulta.idPaciente.take(6)}..."
+                            }
+
+                            consultas.add(
+                                texto to ConsultaItem(
+                                    id = consulta.id,
+                                    idPaciente = consulta.idPaciente,
+                                    dataHoraConsulta = consulta.dataHoraConsulta
+                                )
+                            )
+                        }
+
+                        withContext(Dispatchers.Main) {
+                            val adapter = ArrayAdapter(
+                                requireContext(),
+                                android.R.layout.simple_spinner_dropdown_item,
+                                consultas.map { it.first }
+                            )
+                            binding.spinnerConsultas.adapter = adapter
+                            binding.spinnerConsultas.isEnabled = true
+                            binding.textPaciente.text = "Selecione uma consulta"
+
+                            binding.spinnerConsultas.onItemSelectedListener =
+                                object : AdapterView.OnItemSelectedListener {
+                                    override fun onItemSelected(
+                                        parent: AdapterView<*>?,
+                                        view: View?,
+                                        position: Int,
+                                        id: Long
+                                    ) {
+                                        consultaSelecionada = consultas[position].second
+                                        buscarNomePaciente(consultaSelecionada!!.idPaciente)
+                                    }
+
+                                    override fun onNothingSelected(parent: AdapterView<*>?) {
+                                        binding.textPaciente.text = "Selecione uma consulta"
+                                    }
+                                }
+
+                            Toast.makeText(
+                                requireContext(),
+                                "Consultas carregadas: ${consultas.size}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+
+                    is AppResult.Error -> {
+                        withContext(Dispatchers.Main) {
+                            binding.textPaciente.text =
+                                "Erro ao buscar consultas: ${result.throwable.message}"
+                        }
+                    }
                 }
 
             } catch (e: Exception) {
@@ -203,6 +204,7 @@ class LobbyMedicoFragment : Fragment() {
     // ====================================================
     // 🔹 EXIBIR PRONTUÁRIOS
     // ====================================================
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun showProntuarioDialog() {
         val pacienteId = consultaSelecionada?.idPaciente ?: return
 
@@ -260,6 +262,7 @@ class LobbyMedicoFragment : Fragment() {
     // ====================================================
     // 🔹 BOTÕES
     // ====================================================
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun setupButtons() = with(binding) {
         btnProntuario.setOnClickListener {
             if (consultaSelecionada == null) {
@@ -285,7 +288,6 @@ class LobbyMedicoFragment : Fragment() {
             val consultaId = consultaSelecionada!!.id
             Log.d("LobbyMedico", "➡️ Iniciando consulta para pacienteId=$pacienteId")
 
-            // ✅ Navegação centralizada via Navigator
             Navigator.toRealizarConsulta(this@LobbyMedicoFragment, pacienteId, consultaId)
         }
 

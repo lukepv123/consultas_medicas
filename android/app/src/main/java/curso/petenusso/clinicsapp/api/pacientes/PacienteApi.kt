@@ -1,6 +1,6 @@
 package curso.petenusso.clinicsapp.api.pacientes
 
-
+import curso.petenusso.clinicsapp.api.RetrofitFactory
 import curso.petenusso.clinicsapp.api.pacientes.dto.IdResponse
 import curso.petenusso.clinicsapp.api.pacientes.dto.PacienteCreateRequest
 import curso.petenusso.clinicsapp.api.pacientes.dto.PacienteDTO
@@ -12,21 +12,16 @@ import retrofit2.http.Path
 
 interface PacienteApi {
 
-    // ✅ Novo endpoint para criar paciente
     @POST("pacientes")
-    suspend fun cadastrarPaciente(
-        @Body body: PacienteCreateRequest
-    ): Response<Void>
+    suspend fun cadastrarPaciente(@Body body: PacienteCreateRequest): Response<Void>
 
-    // CPF -> ID
     @GET("pacientes/cpf/{cpf}/id")
-    suspend fun buscarIdPorCpf(
-        @Path("cpf") cpf: String
-    ): Response<IdResponse>
+    suspend fun buscarIdPorCpf(@Path("cpf") cpf: String): Response<IdResponse>
 
-    // 🔎 Buscar paciente por ID
     @GET("pacientes/{id}")
-    suspend fun buscar(
-        @Path("id") id: String
-    ): Response<PacienteDTO>
+    suspend fun buscar(@Path("id") id: String): Response<PacienteDTO>
+
+    companion object {
+        fun create(): PacienteApi = RetrofitFactory.retrofit().create(PacienteApi::class.java)
+    }
 }

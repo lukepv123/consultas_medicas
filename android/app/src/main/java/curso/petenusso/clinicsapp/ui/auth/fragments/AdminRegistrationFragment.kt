@@ -12,8 +12,6 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import curso.petenusso.clinicsapp.R
-import curso.petenusso.clinicsapp.api.RetrofitFactory
-import curso.petenusso.clinicsapp.api.adm.AdminApi
 import curso.petenusso.clinicsapp.core.AppResult
 import curso.petenusso.clinicsapp.core.Navigator
 import curso.petenusso.clinicsapp.data.adm.AdminRepository
@@ -21,17 +19,14 @@ import curso.petenusso.clinicsapp.databinding.FragmentAdminRegistrationBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import retrofit2.create
 
 class AdminRegistrationFragment : Fragment() {
 
     private var _binding: FragmentAdminRegistrationBinding? = null
     private val binding get() = _binding!!
 
-    private val repo by lazy {
-        val api = RetrofitFactory.retrofit().create<AdminApi>()
-        AdminRepository(api)
-    }
+    // ✅ Usa apenas o repositório (sem Retrofit direto)
+    private val adminRepo by lazy { AdminRepository() }
 
     companion object {
         private const val EMAIL_MAX = 120
@@ -61,12 +56,12 @@ class AdminRegistrationFragment : Fragment() {
     }
 
     private fun setupValidation() = with(binding) {
-        // Limites
+        // Limites de tamanho
         edtEmail.filters = arrayOf(InputFilter.LengthFilter(EMAIL_MAX))
         edtPassword.filters = arrayOf(InputFilter.LengthFilter(PASS_MAX))
         edtConfirmPassword.filters = arrayOf(InputFilter.LengthFilter(PASS_MAX))
 
-        // Validação dinâmica
+        // Validação de e-mail
         edtEmail.doAfterTextChanged {
             val email = it?.toString()?.trim().orEmpty()
             edtEmail.error = if (email.isNotEmpty() &&
@@ -74,6 +69,7 @@ class AdminRegistrationFragment : Fragment() {
             ) "E-mail inválido" else null
         }
 
+        // Validação de senha e confirmação
         edtPassword.doAfterTextChanged { validatePasswords() }
         edtConfirmPassword.doAfterTextChanged { validatePasswords() }
     }
@@ -94,15 +90,12 @@ class AdminRegistrationFragment : Fragment() {
             else -> null
         }
 
-        // Mostra o ícone apenas quando o usuário digita algo
         ivPasswordMatchStatus.visibility = if (confirmar.isNotEmpty()) View.VISIBLE else View.GONE
 
-        // Atualiza o ícone conforme a correspondência
         if (confirmar.isNotEmpty()) {
             val iconRes = if (confirmar == senha) R.drawable.ic_check_green else R.drawable.ic_check_red
             ivPasswordMatchStatus.setImageResource(iconRes)
 
-            // Animação suave (fade)
             ObjectAnimator.ofFloat(ivPasswordMatchStatus, "alpha", 0f, 1f).apply {
                 duration = 250
                 start()
@@ -134,7 +127,7 @@ class AdminRegistrationFragment : Fragment() {
     }
 
     // =====================================================
-    // 🚀 Cadastrar administrador
+    // 🚀 Cadastrar administrador via repository
     // =====================================================
     private fun cadastrarAdmin() = with(binding) {
         if (!validateAll()) return@with
@@ -145,7 +138,8 @@ class AdminRegistrationFragment : Fragment() {
         setLoading(true)
 
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            val result = repo.createAdmin(email, senha)
+            val result = adminRepo.createAdmin(email, senha)
+
             withContext(Dispatchers.Main) {
                 setLoading(false)
                 when (result) {
@@ -153,9 +147,8 @@ class AdminRegistrationFragment : Fragment() {
                         toast("Administrador cadastrado com sucesso!")
                         Navigator.toLogin(this@AdminRegistrationFragment)
                     }
-
                     is AppResult.Error -> {
-                        toast(result.throwable.message ?: "Erro ao cadastrar")
+                        toast(result.throwable.message ?: "Erro ao cadastrar administrador.")
                     }
                 }
             }

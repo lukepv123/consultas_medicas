@@ -6,7 +6,9 @@ import curso.petenusso.clinicsapp.api.medico.dto.*
 import curso.petenusso.clinicsapp.core.AppResult
 import curso.petenusso.clinicsapp.core.runCatchingResult
 
-class MedicoRepository(private val api: MedicoApi) {
+class MedicoRepository {
+
+    private val api = MedicoApi.create()
 
     suspend fun criarComAccount(
         crm: String,
@@ -25,8 +27,6 @@ class MedicoRepository(private val api: MedicoApi) {
         )
     }
 
-
-
     suspend fun atualizar(id: String, dto: MedicoDTO) =
         runCatchingResult { api.atualizar(id, dto) }
 
@@ -35,7 +35,4 @@ class MedicoRepository(private val api: MedicoApi) {
     suspend fun buscar(id: String) = runCatchingResult { api.buscar(id) }
 
     suspend fun remover(id: String) = runCatchingResult { api.remover(id) }
-
-
-
 }

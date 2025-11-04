@@ -13,8 +13,6 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import curso.petenusso.clinicsapp.R
-import curso.petenusso.clinicsapp.api.RetrofitFactory
-import curso.petenusso.clinicsapp.api.medico.MedicoApi
 import curso.petenusso.clinicsapp.core.AppResult
 import curso.petenusso.clinicsapp.core.Navigator
 import curso.petenusso.clinicsapp.data.medico.MedicoRepository
@@ -27,10 +25,8 @@ class CadastrarMedicoAdmFragment : Fragment() {
     private var _binding: FragmentCadastrarMedicoAdmBinding? = null
     private val binding get() = _binding!!
 
-    private val repo by lazy {
-        val api = RetrofitFactory.retrofit().create(MedicoApi::class.java)
-        MedicoRepository(api)
-    }
+    // ✅ Usa o repositório centralizado (sem criar Retrofit manualmente)
+    private val repo by lazy { MedicoRepository() }
 
     // ---- Regras de segurança ----
     private companion object Rules {
@@ -106,7 +102,6 @@ class CadastrarMedicoAdmFragment : Fragment() {
                 binding.edtEmail.error = "E-mail inválido"
             else binding.edtEmail.error = null
         }
-
 
         binding.edtSenha.doAfterTextChanged { validatePasswords(); animatePasswordIcon() }
         binding.edtRepetirSenha.doAfterTextChanged { validatePasswords(); animatePasswordIcon() }
@@ -188,7 +183,6 @@ class CadastrarMedicoAdmFragment : Fragment() {
                 is AppResult.Error -> {
                     setLoading(false)
                     toast("Erro ao cadastrar médico")
-
                 }
             }
         }
@@ -203,9 +197,10 @@ class CadastrarMedicoAdmFragment : Fragment() {
     private fun toast(msg: String) =
         Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
 
-    override fun onDestroyView() { _binding = null; super.onDestroyView() }
-
-
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
+    }
 
     private fun animatePasswordIcon() = with(binding) {
         val senha = edtSenha.text?.toString().orEmpty()
@@ -218,8 +213,6 @@ class CadastrarMedicoAdmFragment : Fragment() {
             ivPasswordMatchStatus.animate().alpha(1f).setDuration(250).start()
         }
     }
-
-
 }
 
 /** Filtro para permitir apenas caracteres válidos conforme regex */

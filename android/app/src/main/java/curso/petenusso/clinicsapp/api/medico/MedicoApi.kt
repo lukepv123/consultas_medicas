@@ -1,18 +1,14 @@
 package curso.petenusso.clinicsapp.api.medico
 
-import curso.petenusso.clinicsapp.api.medico.dto.CreateMedicoRequest
-import curso.petenusso.clinicsapp.api.medico.dto.CreateMedicoResponse
-import curso.petenusso.clinicsapp.api.medico.dto.MedicoBasicResponse
-import curso.petenusso.clinicsapp.api.medico.dto.MedicoDTO
-import retrofit2.http.*
-import curso.petenusso.clinicsapp.api.medico.dto.MedicoListResponse
+import curso.petenusso.clinicsapp.api.RetrofitFactory
+import curso.petenusso.clinicsapp.api.medico.dto.*
 import retrofit2.Response
+import retrofit2.http.*
 
 interface MedicoApi {
+
     @POST("medicos")
-    suspend fun criar(
-        @Body req: CreateMedicoRequest
-    ): CreateMedicoResponse
+    suspend fun criar(@Body req: CreateMedicoRequest): CreateMedicoResponse
 
     @PUT("medicos/{id}")
     suspend fun atualizar(@Path("id") id: String, @Body body: MedicoDTO): MedicoDTO
@@ -23,7 +19,6 @@ interface MedicoApi {
     @DELETE("medicos/{id}")
     suspend fun remover(@Path("id") id: String)
 
-
     @GET("medicos")
     suspend fun listar(
         @Query("page") page: Int = 1,
@@ -31,9 +26,10 @@ interface MedicoApi {
         @Query("especialidade") especialidade: String? = null
     ): MedicoListResponse
 
-
     @GET("medicos/{id}/basico")
-    suspend fun buscarBasico(
-        @Path("id") id: String
-    ): Response<MedicoBasicResponse>
+    suspend fun buscarBasico(@Path("id") id: String): Response<MedicoBasicResponse>
+
+    companion object {
+        fun create(): MedicoApi = RetrofitFactory.retrofit().create(MedicoApi::class.java)
+    }
 }
