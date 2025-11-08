@@ -7,5 +7,9 @@ import org.springframework.boot.runApplication
 class ConsultasMedicasApplication
 
 fun main(args: Array<String>) {
+	System.out.print("Bunda do marcos")
 	runApplication<ConsultasMedicasApplication>(*args)
+
 }
+
+
