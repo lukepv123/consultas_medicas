@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.datepicker.CalendarConstraints
@@ -195,6 +196,7 @@ class AgendarConsultaPacienteFragment : Fragment() {
             .setMessage("Deseja agendar a consulta em ${SimpleDateFormat("dd/MM/yyyy").format(data.time)} às $hora com Dr(a). ${medico.nome}?")
             .setPositiveButton("Sim") { _, _ ->
                 cadastrarConsulta(dataHora, medico.id, paciente.pacienteId)
+
             }
             .setNegativeButton("Não", null)
             .show()
@@ -209,7 +211,10 @@ class AgendarConsultaPacienteFragment : Fragment() {
                 is AppResult.Success -> {
                     withContext(Dispatchers.Main) {
                         when (result.data) {
-                            201 -> Snackbar.make(binding.root, "✅ Consulta cadastrada com sucesso!", Snackbar.LENGTH_LONG).show()
+                            201 -> {
+                                Snackbar.make(binding.root, "✅ Consulta cadastrada com sucesso!", Snackbar.LENGTH_LONG).show()
+                                Navigator.showPacienteLobby(requireActivity() as AppCompatActivity)
+                            }
                             409 -> Snackbar.make(binding.root, "⚠️ Horário indisponível, escolha outro.", Snackbar.LENGTH_LONG).show()
                             422 -> Snackbar.make(binding.root, "⚠️ Data/hora inválida.", Snackbar.LENGTH_LONG).show()
                             401, 403 -> Snackbar.make(binding.root, "Sessão expirada, faça login novamente.", Snackbar.LENGTH_LONG).show()
