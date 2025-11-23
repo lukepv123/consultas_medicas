@@ -12,6 +12,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import curso.petenusso.clinicsapp.api.prontuarios.dto.CreateProntuarioRequest
 import curso.petenusso.clinicsapp.core.AppResult
 import curso.petenusso.clinicsapp.core.Navigator
+import curso.petenusso.clinicsapp.data.firebase.PacienteFirebaseRepository
+import curso.petenusso.clinicsapp.data.firebase.ProntuarioFirebaseRepository
 import curso.petenusso.clinicsapp.data.paciente.PacienteRepository
 import curso.petenusso.clinicsapp.data.prontuario.ProntuarioRepository
 import curso.petenusso.clinicsapp.databinding.FragmentRealizarConsultasBinding
@@ -30,6 +32,10 @@ class RealizarConsultasFragment : Fragment() {
 
     private val prontuarioRepo = ProntuarioRepository()
     private val pacienteRepo = PacienteRepository()
+    private val pacienteFirebaseRepo by lazy { PacienteFirebaseRepository() }
+    private val prontuarioFirebaseRepo by lazy { ProntuarioFirebaseRepository() }
+
+
 
     // guardamos o e-mail carregado do paciente
     private var pacienteEmail: String? = null
@@ -139,7 +145,7 @@ class RealizarConsultasFragment : Fragment() {
     // 🔹 Busca os dados do paciente pelo ID (usa PacienteRepository)
     private suspend fun buscarInformacoesPaciente(id: String) {
         withContext(Dispatchers.IO) {
-            val result = pacienteRepo.buscarPaciente(id)
+            val result = pacienteFirebaseRepo.buscarPaciente(id)
             withContext(Dispatchers.Main) {
                 when (result) {
                     is AppResult.Success -> {
@@ -162,7 +168,7 @@ class RealizarConsultasFragment : Fragment() {
 
     private suspend fun enviarProntuario(request: CreateProntuarioRequest) {
         withContext(Dispatchers.IO) {
-            val result = prontuarioRepo.criarProntuario(request)
+            val result = prontuarioFirebaseRepo.criarProntuario(request)
 
             withContext(Dispatchers.Main) {
                 when (result) {

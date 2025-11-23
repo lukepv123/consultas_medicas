@@ -24,7 +24,7 @@
     <string name="fragment_realizar_consultas_hint_exames">Demander des examens</string>
     <string name="fragment_realizar_consultas_hint_medicacao">Médication</string>
     <string name="fragment_realizar_consultas_hint_atendimento">Détails des soins</string>
-    <string name="fragment_realizar_consultas_btn_concluir">Terminer la consultation</string>
+    <string name="fragment_realizar_consultas_btn_concluir">Terminer</string>
     <string name="fragment_realizar_consultas_btn_enviar_email">Envoyer l\'ordonnance par e-mail</string>
 
     <string name="fragment_lobby_medico_logo_content_desc">Logo de l\'application</string>
@@ -33,7 +33,7 @@
     <string name="fragment_lobby_medico_label_paciente">Patient :</string>
     <string name="fragment_lobby_medico_placeholder_paciente">Sélectionnez une consultation</string>
     <string name="fragment_lobby_medico_btn_prontuario">Voir le dossier médical</string>
-    <string name="fragment_lobby_medico_btn_realizar_consulta">Effectuer la consultation</string>
+    <string name="fragment_lobby_medico_btn_realizar_consulta">Créer Dossier Médical</string>
     <string name="fragment_lobby_medico_btn_logout">Se déconnecter</string>
 
 

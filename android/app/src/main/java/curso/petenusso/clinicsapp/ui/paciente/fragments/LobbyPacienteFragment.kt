@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.google.firebase.auth.FirebaseAuth
 import curso.petenusso.clinicsapp.core.Navigator
 import curso.petenusso.clinicsapp.databinding.FragmentLobbyPacienteBinding
 import curso.petenusso.clinicsapp.ui.paciente.PacienteActivity
@@ -43,6 +44,7 @@ class LobbyPacienteFragment : Fragment() {
 
         btnLogout.setOnClickListener {
             // Logout explícito: pede para a Activity limpar sessão e sair
+            FirebaseAuth.getInstance().signOut()
             (requireActivity() as? PacienteActivity)?.logoutToLogin()
         }
     }

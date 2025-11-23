@@ -24,7 +24,7 @@
     <string name="fragment_realizar_consultas_hint_exames">Solicitar exámenes</string>
     <string name="fragment_realizar_consultas_hint_medicacao">Medicación</string>
     <string name="fragment_realizar_consultas_hint_atendimento">Atención</string>
-    <string name="fragment_realizar_consultas_btn_concluir">Concluir Consulta</string>
+    <string name="fragment_realizar_consultas_btn_concluir">Concluir</string>
     <string name="fragment_realizar_consultas_btn_enviar_email">Enviar Receta por Correo</string>
 
     <string name="fragment_lobby_medico_logo_content_desc">Logotipo de la aplicación</string>
@@ -33,7 +33,7 @@
     <string name="fragment_lobby_medico_label_paciente">Paciente:</string>
     <string name="fragment_lobby_medico_placeholder_paciente">Seleccione una consulta</string>
     <string name="fragment_lobby_medico_btn_prontuario">Ver Historial</string>
-    <string name="fragment_lobby_medico_btn_realizar_consulta">Realizar Consulta</string>
+    <string name="fragment_lobby_medico_btn_realizar_consulta">Crear Prontuario</string>
     <string name="fragment_lobby_medico_btn_logout">Salir</string>
 
 

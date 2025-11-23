@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import curso.petenusso.clinicsapp.core.AppResult
 import curso.petenusso.clinicsapp.core.Navigator
 import curso.petenusso.clinicsapp.data.adm.AdminRepository
+import curso.petenusso.clinicsapp.data.firebase.AdmFirebaseRepository
 import curso.petenusso.clinicsapp.databinding.FragmentLoginBinding
 import curso.petenusso.clinicsapp.model.session.SessionManager
 import kotlinx.coroutines.launch
@@ -22,6 +23,8 @@ class LoginFragment : Fragment() {
 
     // ✅ Usa apenas o repositório (sem Retrofit direto)
     private val adminRepo by lazy { AdminRepository() }
+
+    private val adminRepoFirebase by lazy { AdmFirebaseRepository() }
 
     // Regex para validar e-mails em minúsculas
     private val EMAIL_LOWER_REGEX = Regex("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$")
@@ -67,7 +70,7 @@ class LoginFragment : Fragment() {
         // 4️⃣ Chamada ao repositório
         setLoading(true)
         viewLifecycleOwner.lifecycleScope.launch {
-            when (val result = adminRepo.login(emailRaw, senha)) {
+            when (val result = adminRepoFirebase.login(emailRaw, senha)) {
                 is AppResult.Success -> {
                     setLoading(false)
                     SessionManager.set(result.data)

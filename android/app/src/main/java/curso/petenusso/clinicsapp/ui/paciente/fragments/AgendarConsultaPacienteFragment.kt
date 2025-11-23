@@ -16,6 +16,8 @@ import curso.petenusso.clinicsapp.api.consulta.dto.CreateConsultaRequest
 import curso.petenusso.clinicsapp.core.AppResult
 import curso.petenusso.clinicsapp.core.Navigator
 import curso.petenusso.clinicsapp.data.consultas.ConsultaRepository
+import curso.petenusso.clinicsapp.data.firebase.ConsultasFirebaseRepository
+import curso.petenusso.clinicsapp.data.firebase.MedicoFirebaseRepository
 import curso.petenusso.clinicsapp.data.medico.MedicoRepository
 import curso.petenusso.clinicsapp.databinding.FragmentAgendarConsultaPacienteBinding
 import curso.petenusso.clinicsapp.model.medico.Especialidade
@@ -34,6 +36,9 @@ class AgendarConsultaPacienteFragment : Fragment() {
     // ✅ Substituindo Retrofit direto por repositories
     private val medicoRepo = MedicoRepository()
     private val consultaRepo = ConsultaRepository()
+
+    private val medicoFirebaseRepo by lazy { MedicoFirebaseRepository() }
+    private val consultasFirebaseRepo by lazy { ConsultasFirebaseRepository() }
 
     private var dataSelecionada: Calendar? = null
     private var medicoSelecionado: curso.petenusso.clinicsapp.api.medico.dto.MedicoDTO? = null
@@ -129,7 +134,7 @@ class AgendarConsultaPacienteFragment : Fragment() {
     private fun carregarMedicosPorEspecialidade(especialidade: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                when (val result = medicoRepo.listar()) {
+                when (val result = medicoFirebaseRepo.listar()) {
                     is AppResult.Success -> {
                         val medicosFiltrados = result.data.data.filter {
                             it.especialidade.equals(especialidade, ignoreCase = true)
@@ -200,7 +205,7 @@ class AgendarConsultaPacienteFragment : Fragment() {
     // ======================================================
     private fun cadastrarConsulta(dataHora: String, idMedico: String, idPaciente: String) {
         lifecycleScope.launch(Dispatchers.IO) {
-            when (val result = consultaRepo.cadastrar(CreateConsultaRequest(dataHora, idMedico, idPaciente))) {
+            when (val result = consultasFirebaseRepo.cadastrar(CreateConsultaRequest(dataHora, idMedico, idPaciente))) {
                 is AppResult.Success -> {
                     withContext(Dispatchers.Main) {
                         when (result.data) {

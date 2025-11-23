@@ -15,6 +15,7 @@ import curso.petenusso.clinicsapp.R
 import curso.petenusso.clinicsapp.api.dto.AccountDTO
 import curso.petenusso.clinicsapp.api.pacientes.dto.PacienteCreateRequest
 import curso.petenusso.clinicsapp.core.AppResult
+import curso.petenusso.clinicsapp.data.firebase.PacienteFirebaseRepository
 import curso.petenusso.clinicsapp.data.paciente.PacienteRepository
 import curso.petenusso.clinicsapp.databinding.FragmentCriarContaPacienteBinding
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +29,7 @@ class CriarContaPacienteFragment : Fragment() {
 
     // ✅ Agora usa apenas o repository
     private val pacienteRepo by lazy { PacienteRepository() }
-
+    private val pacienteFirebaseRepo by lazy { PacienteFirebaseRepository() }
     // ---------- Regras ----------
     private companion object Rules {
         const val CPF_LENGTH = 11
@@ -175,7 +176,7 @@ class CriarContaPacienteFragment : Fragment() {
 
         setLoading(true)
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            val result = pacienteRepo.cadastrar(dto)
+            val result = pacienteFirebaseRepo.cadastrar(dto)
             withContext(Dispatchers.Main) {
                 setLoading(false)
                 when (result) {

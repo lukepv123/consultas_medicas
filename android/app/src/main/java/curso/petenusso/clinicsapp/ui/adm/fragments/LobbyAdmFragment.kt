@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.google.firebase.auth.FirebaseAuth
 import curso.petenusso.clinicsapp.core.Navigator
 import curso.petenusso.clinicsapp.databinding.FragmentLobbyAdmBinding
 import curso.petenusso.clinicsapp.model.session.SessionManager
@@ -22,6 +23,7 @@ class LobbyAdmFragment : Fragment() {
         binding.btnCadastrarMedico.setOnClickListener { Navigator.toAdminCadastrarMedico(this) }
         binding.btnCancelarConsulta.setOnClickListener { Navigator.toAdminCancelarConsulta(this) }
         binding.btnLogout.setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
             SessionManager.clear()
             Navigator.logoutToLogin(requireContext())
         }

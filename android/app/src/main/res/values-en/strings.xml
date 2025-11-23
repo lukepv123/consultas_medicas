@@ -24,7 +24,7 @@
     <string name="fragment_realizar_consultas_hint_exames">Request exams</string>
     <string name="fragment_realizar_consultas_hint_medicacao">Medication</string>
     <string name="fragment_realizar_consultas_hint_atendimento">Care Details</string>
-    <string name="fragment_realizar_consultas_btn_concluir">Conclude Appointment</string>
+    <string name="fragment_realizar_consultas_btn_concluir">Conclude</string>
     <string name="fragment_realizar_consultas_btn_enviar_email">Send Prescription via Email</string>
 
     <string name="fragment_lobby_medico_logo_content_desc">App logo</string>
@@ -33,7 +33,7 @@
     <string name="fragment_lobby_medico_label_paciente">Patient:</string>
     <string name="fragment_lobby_medico_placeholder_paciente">Select an appointment</string>
     <string name="fragment_lobby_medico_btn_prontuario">View Medical Record</string>
-    <string name="fragment_lobby_medico_btn_realizar_consulta">Start Appointment</string>
+    <string name="fragment_lobby_medico_btn_realizar_consulta">Create Medical Record</string>
     <string name="fragment_lobby_medico_btn_logout">Log Out</string>
 
 

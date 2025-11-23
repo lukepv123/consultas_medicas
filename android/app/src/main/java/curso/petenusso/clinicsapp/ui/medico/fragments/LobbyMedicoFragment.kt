@@ -9,9 +9,13 @@ import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.auth.FirebaseAuth
 import curso.petenusso.clinicsapp.core.AppResult
 import curso.petenusso.clinicsapp.core.Navigator
 import curso.petenusso.clinicsapp.data.consultas.ConsultaRepository
+import curso.petenusso.clinicsapp.data.firebase.ConsultasFirebaseRepository
+import curso.petenusso.clinicsapp.data.firebase.PacienteFirebaseRepository
+import curso.petenusso.clinicsapp.data.firebase.ProntuarioFirebaseRepository
 import curso.petenusso.clinicsapp.data.paciente.PacienteRepository
 import curso.petenusso.clinicsapp.data.prontuario.ProntuarioRepository
 import curso.petenusso.clinicsapp.databinding.FragmentLobbyMedicoBinding
@@ -33,6 +37,10 @@ class LobbyMedicoFragment : Fragment() {
     private val consultaRepo = ConsultaRepository()
     private val pacienteRepo = PacienteRepository()
     private val prontuarioRepo = ProntuarioRepository()
+
+    private val pacienteFirebaseRepo by lazy { PacienteFirebaseRepository() }
+    private val prontuarioFirebaseRepo by lazy { ProntuarioFirebaseRepository() }
+    private val consultaFirebaseRepo by lazy { ConsultasFirebaseRepository() }
 
     private val consultas = mutableListOf<Pair<String, ConsultaItem>>()
     private var consultaSelecionada: ConsultaItem? = null
@@ -77,7 +85,7 @@ class LobbyMedicoFragment : Fragment() {
                 Log.d("LobbyMedico", "🔹 Requisição: medicoId=$medicoId, email=${medicoSessao?.emailOrUser}")
 
                 // ✅ Agora usa o repository (mesma lógica de resposta)
-                val result = consultaRepo.listarFuturasMedico(medicoId)
+                val result = consultaFirebaseRepo.listarFuturasMedico(medicoId)
 
                 when (result) {
                     is AppResult.Success -> {
@@ -175,7 +183,7 @@ class LobbyMedicoFragment : Fragment() {
                     binding.textPaciente.text = "Buscando paciente..."
                 }
 
-                val result = pacienteRepo.buscarPaciente(idPaciente)
+                val result = pacienteFirebaseRepo.buscarPaciente(idPaciente)
 
                 withContext(Dispatchers.Main) {
                     when (result) {
@@ -209,7 +217,7 @@ class LobbyMedicoFragment : Fragment() {
         val pacienteId = consultaSelecionada?.idPaciente ?: return
 
         lifecycleScope.launch {
-            when (val result = prontuarioRepo.listarPorPaciente(pacienteId)) {
+            when (val result = prontuarioFirebaseRepo.listarPorPaciente(pacienteId)) {
                 is AppResult.Success -> {
                     if (result.data.isEmpty()) {
                         MaterialAlertDialogBuilder(requireContext())
@@ -292,6 +300,7 @@ class LobbyMedicoFragment : Fragment() {
         }
 
         btnLogout.setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
             SessionManager.clear()
             Navigator.logoutToLogin(requireContext())
         }

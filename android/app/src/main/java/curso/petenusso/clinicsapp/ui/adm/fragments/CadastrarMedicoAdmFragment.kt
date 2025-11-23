@@ -15,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import curso.petenusso.clinicsapp.R
 import curso.petenusso.clinicsapp.core.AppResult
 import curso.petenusso.clinicsapp.core.Navigator
+import curso.petenusso.clinicsapp.data.firebase.MedicoFirebaseRepository
 import curso.petenusso.clinicsapp.data.medico.MedicoRepository
 import curso.petenusso.clinicsapp.databinding.FragmentCadastrarMedicoAdmBinding
 import curso.petenusso.clinicsapp.model.medico.Especialidade
@@ -27,7 +28,7 @@ class CadastrarMedicoAdmFragment : Fragment() {
 
     // ✅ Usa o repositório centralizado (sem criar Retrofit manualmente)
     private val repo by lazy { MedicoRepository() }
-
+    private val repoFirebase by lazy { MedicoFirebaseRepository()}
     // ---- Regras de segurança ----
     private companion object Rules {
         const val CRM_MIN = 6
@@ -168,7 +169,7 @@ class CadastrarMedicoAdmFragment : Fragment() {
 
         setLoading(true)
         viewLifecycleOwner.lifecycleScope.launch {
-            when (val res = repo.criarComAccount(
+            when (val res = repoFirebase.criarComAccount(
                 crm = crm,
                 nome = nome,
                 especialidadeEnumName = especialidade,

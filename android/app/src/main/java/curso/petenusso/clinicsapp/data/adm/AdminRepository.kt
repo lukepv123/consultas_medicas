@@ -14,17 +14,6 @@ class AdminRepository {
     private val apiAuth = RetrofitFactory.retrofit().create(AdminApi::class.java)
     private val apiPublic = RetrofitFactoryPublic.retrofit().create(AdminApi::class.java)
 
-    /** 🔹 Verifica status inicial do sistema (público) */
-//    suspend fun status(): AppResult<SetupStatusResponse> = try {
-//        val response = apiPublic.getSetupStatus()
-//        if (response.isSuccessful && response.body() != null) {
-//            AppResult.Success(response.body()!!)
-//        } else {
-//            AppResult.Error(Throwable("Erro ${response.code()} ao verificar status"))
-//        }
-//    } catch (e: Exception) {
-//        AppResult.Error(e)
-//    }
 
     suspend fun status(): AppResult<SetupStatusResponse> = try {
         val response = apiPublic.getSetupStatus()

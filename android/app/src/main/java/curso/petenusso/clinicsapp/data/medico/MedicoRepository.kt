@@ -27,12 +27,17 @@ class MedicoRepository {
         )
     }
 
-    suspend fun atualizar(id: String, dto: MedicoDTO) =
-        runCatchingResult { api.atualizar(id, dto) }
 
     suspend fun listar() = runCatchingResult { api.listar() }
 
-    suspend fun buscar(id: String) = runCatchingResult { api.buscar(id) }
 
-    suspend fun remover(id: String) = runCatchingResult { api.remover(id) }
+
+//
+//
+//    suspend fun atualizar(id: String, dto: MedicoDTO) =
+//        runCatchingResult { api.atualizar(id, dto) }
+//
+//    suspend fun buscar(id: String) = runCatchingResult { api.buscar(id) }
+//
+//    suspend fun remover(id: String) = runCatchingResult { api.remover(id) }
 }
