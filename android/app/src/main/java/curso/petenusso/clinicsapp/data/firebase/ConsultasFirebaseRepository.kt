@@ -224,19 +224,43 @@ class ConsultasFirebaseRepository(
             val agora = Timestamp.now()
             val currentUid = auth.currentUser?.uid
 
-            // Verificar se já existe consulta nesse mesmo horário para o MESMO paciente
-            val conflitosSnap = consultasCollection
-                .whereEqualTo("ref_paciente", pacienteRef)
+            // =========================================================
+            // 1) VERIFICAR CONFLITO PARA O MÉDICO NESSE HORÁRIO
+            //    (médico não pode ter duas consultas no mesmo dia/hora)
+            // =========================================================
+            val conflitosMedicoSnap = consultasCollection
+                .whereEqualTo("ref_medico", medicoRef)
                 .whereEqualTo("data_hora", dataHoraTs)
+                .whereEqualTo("status", STATUS_AGENDADA) // só considera as ativas
                 .get()
                 .await()
 
-            if (!conflitosSnap.isEmpty) {
-                // Simula HTTP 409 - CONFLICT
+            if (!conflitosMedicoSnap.isEmpty) {
+                // Já existe consulta AGENDADA para esse médico nesse horário
+                // → simula HTTP 409 - CONFLICT
                 return AppResult.Success(409)
             }
 
-            // Monta dados da consulta
+            // =========================================================
+            // 2) (OPCIONAL, MAS RECOMENDÁVEL)
+            //    VERIFICAR CONFLITO PARA O PACIENTE NESSE HORÁRIO
+            //    (paciente não marca 2 consultas no mesmo horário)
+            // =========================================================
+            val conflitosPacienteSnap = consultasCollection
+                .whereEqualTo("ref_paciente", pacienteRef)
+                .whereEqualTo("data_hora", dataHoraTs)
+                .whereEqualTo("status", STATUS_AGENDADA)
+                .get()
+                .await()
+
+            if (!conflitosPacienteSnap.isEmpty) {
+                // Paciente já tem consulta AGENDADA nesse horário
+                return AppResult.Success(409)
+            }
+
+            // =========================================================
+            // 3) SE NÃO HOUVE CONFLITO → CRIAR CONSULTA NORMALMENTE
+            // =========================================================
             val consultaData = hashMapOf(
                 "data_cadastro" to agora,
                 "data_hora" to dataHoraTs,
@@ -267,6 +291,7 @@ class ConsultasFirebaseRepository(
             AppResult.Error(e)
         }
     }
+
 
     // =========================================================
     // CANCELAR CONSULTA

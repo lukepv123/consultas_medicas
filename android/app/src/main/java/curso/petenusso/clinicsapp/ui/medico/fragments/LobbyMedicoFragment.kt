@@ -107,7 +107,7 @@ class LobbyMedicoFragment : Fragment() {
                             val texto = try {
                                 val instante = Instant.parse(consulta.dataHoraConsulta)
                                 val dataLocal = ZonedDateTime.ofInstant(instante, fuso)
-                                "${dataLocal.format(formatador)} — Paciente ${consulta.idPaciente.take(6)}..."
+                                "${dataLocal.format(formatador)}"
                             } catch (e: Exception) {
                                 "Data inválida — Paciente ${consulta.idPaciente.take(6)}..."
                             }

@@ -80,6 +80,12 @@ class RealizarConsultasFragment : Fragment() {
                 return@setOnClickListener
             }
 
+            // 🔴 Validação dos campos obrigatórios
+            if (!areAllFieldsFilled()) {
+                Toast.makeText(requireContext(), "Preencha todos os campos!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             val alergias = binding.inputAlergias.text.toString()
             val deficiencia = binding.inputDeficiencia.text.toString()
             val comorbidade = binding.inputComorbidade.text.toString()
@@ -109,22 +115,28 @@ class RealizarConsultasFragment : Fragment() {
                 return@setOnClickListener
             }
 
+            // 🔴 Validação dos campos obrigatórios
+            if (!areAllFieldsFilled()) {
+                Toast.makeText(requireContext(), "Preencha todos os campos!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             val subject = "Prontuário da consulta"
             val message = """
-                Olá ${pacienteNome ?: "paciente"},
-                
-                Segue o resumo do prontuário da sua consulta:
+        Olá ${pacienteNome ?: "paciente"},
+        
+        Segue o resumo do prontuário da sua consulta:
 
-                Atendimento: ${binding.inputAtendimento.text}
-                Alergias: ${binding.inputAlergias.text}
-                Deficiência: ${binding.inputDeficiencia.text}
-                Comorbidades: ${binding.inputComorbidade.text}
-                Exames solicitados: ${binding.inputExames.text}
-                Medicação: ${binding.inputMedicacao.text}
+        Atendimento: ${binding.inputAtendimento.text}
+        Alergias: ${binding.inputAlergias.text}
+        Deficiência: ${binding.inputDeficiencia.text}
+        Comorbidades: ${binding.inputComorbidade.text}
+        Exames solicitados: ${binding.inputExames.text}
+        Medicação: ${binding.inputMedicacao.text}
 
-                Atenciosamente,
-                Dr(a). ${SessionManager.asMedico()?.nome ?: "Médico(a)"}
-            """.trimIndent()
+        Atenciosamente,
+        Dr(a). ${SessionManager.asMedico()?.nome ?: "Médico(a)"}
+    """.trimIndent()
 
             val emailIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "message/rfc822"
@@ -198,6 +210,26 @@ class RealizarConsultasFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+
+    private fun areAllFieldsFilled(): Boolean {
+        val alergias = binding.inputAlergias.text.toString().trim()
+        val deficiencia = binding.inputDeficiencia.text.toString().trim()
+        val comorbidade = binding.inputComorbidade.text.toString().trim()
+        val exames = binding.inputExames.text.toString().trim()
+        val medicacao = binding.inputMedicacao.text.toString().trim()
+        val atendimento = binding.inputAtendimento.text.toString().trim()
+
+        return alergias.isNotEmpty()
+                && deficiencia.isNotEmpty()
+                && comorbidade.isNotEmpty()
+                && exames.isNotEmpty()
+                && medicacao.isNotEmpty()
+                && atendimento.isNotEmpty()
+    }
+
+
+
 
     companion object {
         @JvmStatic
