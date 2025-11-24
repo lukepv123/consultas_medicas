@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import curso.petenusso.clinicsapp.R
 import curso.petenusso.clinicsapp.core.AppResult
 import curso.petenusso.clinicsapp.core.Navigator
 import curso.petenusso.clinicsapp.data.adm.AdminRepository
@@ -35,11 +36,12 @@ class SplashFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         // 🌀 Animação do logo
+        binding.imgLogo.setImageResource(R.drawable.logo_clinics)
         binding.imgLogo.startAnimation(AlphaAnimation(0f, 1f).apply { duration = 2000 })
 
         // ⚙️ Verificação do setup
         viewLifecycleOwner.lifecycleScope.launch {
-            delay(1000)
+            delay(2000)
             when (val res = repoFirebase.status()) {
                 is AppResult.Success -> {
                     if (res.data.hasAdmin)

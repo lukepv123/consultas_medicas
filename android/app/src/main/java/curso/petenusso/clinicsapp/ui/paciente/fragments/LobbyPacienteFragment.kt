@@ -20,30 +20,29 @@ class LobbyPacienteFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentLobbyPacienteBinding.inflate(inflater, container, false)
-
         setupListeners()
-
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        // Nada de notificação aqui, só UI
     }
 
     private fun setupListeners() = with(binding) {
         btnAgendar.setOnClickListener {
-            // Navegação interna: continua na mesma Activity -> NÃO limpa sessão
             Navigator.showAgendarConsultaPaciente(this@LobbyPacienteFragment)
         }
 
         btnConsultar.setOnClickListener {
-            // Navegação interna: mesma Activity
             Navigator.showMinhasConsultasPaciente(this@LobbyPacienteFragment)
         }
 
         btnDadosPessoais.setOnClickListener {
-            // Navegação interna: mesma Activity
             Navigator.showDadosPessoaisPaciente(this@LobbyPacienteFragment)
         }
 
         btnLogout.setOnClickListener {
-            // Logout explícito: pede para a Activity limpar sessão e sair
             FirebaseAuth.getInstance().signOut()
             (requireActivity() as? PacienteActivity)?.logoutToLogin()
         }
@@ -51,6 +50,6 @@ class LobbyPacienteFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null // apenas limpa o binding; sessão NÃO é tocada aqui
+        _binding = null
     }
 }

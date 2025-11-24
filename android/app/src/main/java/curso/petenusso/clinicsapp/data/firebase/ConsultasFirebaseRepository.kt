@@ -12,37 +12,10 @@ import curso.petenusso.clinicsapp.api.consulta.dto.CreateConsultaRequest
 import curso.petenusso.clinicsapp.core.AppResult
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-/**
- * Versão Firebase do ConsultaRepository.
- *
- * Mantém MESMOS métodos públicos:
- *
- *  - suspend fun listarFuturasPorPaciente(idPaciente: String): AppResult<List<ConsultaResumoDTO>>
- *  - suspend fun listarFuturasMedico(idMedico: String): AppResult<List<ConsultaDTO>>
- *  - suspend fun listarFuturas(idPaciente: String): AppResult<List<ConsultaDTO>>
- *  - suspend fun listarPassadas(idPaciente: String): AppResult<List<ConsultaDTO>>
- *  - suspend fun cadastrar(body: CreateConsultaRequest): AppResult<Int>
- *  - suspend fun cancelar(body: CancelarConsultaDTO): AppResult<Int>
- *
- * Banco de dados (Firestore):
- *
- *  consultas [
- *      {consultaId} {
- *          data_cadastro: Timestamp
- *          data_hora: Timestamp
- *          ref_medico: /medicos/{medicoId} (DocumentReference)
- *          ref_paciente: /pacientes/{pacienteId} (DocumentReference)
- *          status: String
- *          usuario_ultima_atualizacao: String? (uid do usuário)
- *      }
- *  ]
- *
- *  medicos/{medicoId}.consultas  -> array<DocumentReference> de /consultas/{consultaId}
- *  pacientes/{pacienteId}.consultas -> array<DocumentReference> de /consultas/{consultaId}
- */
 class ConsultasFirebaseRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -61,7 +34,6 @@ class ConsultasFirebaseRepository(
     // LISTAGENS
     // =========================================================
 
-    /** 🔹 Retorna consultas futuras do paciente (equivalente ao PageEnvelope<ConsultaResumoDTO>.list()) */
     suspend fun listarFuturasPorPaciente(idPaciente: String): AppResult<List<ConsultaResumoDTO>> {
         return try {
             val pacienteRef = pacientesCollection.document(idPaciente)
@@ -98,7 +70,6 @@ class ConsultasFirebaseRepository(
         }
     }
 
-    /** 🔹 Retorna consultas futuras de um médico (equivalente a PageEnvelope<ConsultaDTO>.list()) */
     suspend fun listarFuturasMedico(idMedico: String): AppResult<List<ConsultaDTO>> {
         return try {
             val medicoRef = medicosCollection.document(idMedico)
@@ -134,7 +105,6 @@ class ConsultasFirebaseRepository(
         }
     }
 
-    /** 🔹 Retorna lista de futuras (equivalente a ConsultaListResponse.data) */
     suspend fun listarFuturas(idPaciente: String): AppResult<List<ConsultaDTO>> {
         return try {
             val pacienteRef = pacientesCollection.document(idPaciente)
@@ -170,7 +140,6 @@ class ConsultasFirebaseRepository(
         }
     }
 
-    /** 🔹 Retorna lista de passadas (equivalente a ConsultaListResponse.data) */
     suspend fun listarPassadas(idPaciente: String): AppResult<List<ConsultaDTO>> {
         return try {
             val pacienteRef = pacientesCollection.document(idPaciente)
@@ -207,15 +176,9 @@ class ConsultasFirebaseRepository(
     }
 
     // =========================================================
-    // CADASTRAR CONSULTA
+    // CADASTRAR / CANCELAR
     // =========================================================
 
-    /**
-     * 🔹 Cadastra nova consulta (CreateConsultaRequest → AppResult<Int> com código estilo HTTP)
-     *
-     * - 201 → criada com sucesso
-     * - 409 → já existe consulta para o mesmo paciente na mesma data/hora (conflito)
-     */
     suspend fun cadastrar(body: CreateConsultaRequest): AppResult<Int> {
         return try {
             val medicoRef = medicosCollection.document(body.idMedico)
@@ -224,28 +187,17 @@ class ConsultasFirebaseRepository(
             val agora = Timestamp.now()
             val currentUid = auth.currentUser?.uid
 
-            // =========================================================
-            // 1) VERIFICAR CONFLITO PARA O MÉDICO NESSE HORÁRIO
-            //    (médico não pode ter duas consultas no mesmo dia/hora)
-            // =========================================================
             val conflitosMedicoSnap = consultasCollection
                 .whereEqualTo("ref_medico", medicoRef)
                 .whereEqualTo("data_hora", dataHoraTs)
-                .whereEqualTo("status", STATUS_AGENDADA) // só considera as ativas
+                .whereEqualTo("status", STATUS_AGENDADA)
                 .get()
                 .await()
 
             if (!conflitosMedicoSnap.isEmpty) {
-                // Já existe consulta AGENDADA para esse médico nesse horário
-                // → simula HTTP 409 - CONFLICT
                 return AppResult.Success(409)
             }
 
-            // =========================================================
-            // 2) (OPCIONAL, MAS RECOMENDÁVEL)
-            //    VERIFICAR CONFLITO PARA O PACIENTE NESSE HORÁRIO
-            //    (paciente não marca 2 consultas no mesmo horário)
-            // =========================================================
             val conflitosPacienteSnap = consultasCollection
                 .whereEqualTo("ref_paciente", pacienteRef)
                 .whereEqualTo("data_hora", dataHoraTs)
@@ -254,13 +206,9 @@ class ConsultasFirebaseRepository(
                 .await()
 
             if (!conflitosPacienteSnap.isEmpty) {
-                // Paciente já tem consulta AGENDADA nesse horário
                 return AppResult.Success(409)
             }
 
-            // =========================================================
-            // 3) SE NÃO HOUVE CONFLITO → CRIAR CONSULTA NORMALMENTE
-            // =========================================================
             val consultaData = hashMapOf(
                 "data_cadastro" to agora,
                 "data_hora" to dataHoraTs,
@@ -270,47 +218,24 @@ class ConsultasFirebaseRepository(
                 "usuario_ultima_atualizacao" to currentUid
             )
 
-            // 1) Cria doc em /consultas
             val consultaRef = consultasCollection.add(consultaData).await()
 
-            // 2) Adiciona referência em /medicos/{idMedico}.consultas
             medicoRef.update(
                 "consultas",
                 FieldValue.arrayUnion(consultaRef)
             ).await()
 
-            // 3) Adiciona referência em /pacientes/{idPaciente}.consultas
             pacienteRef.update(
                 "consultas",
                 FieldValue.arrayUnion(consultaRef)
             ).await()
 
-            // Sucesso – simula HTTP 201 CREATED
             AppResult.Success(201)
         } catch (e: Exception) {
             AppResult.Error(e)
         }
     }
 
-
-    // =========================================================
-    // CANCELAR CONSULTA
-    // =========================================================
-
-    /**
-     * 🔹 Cancela uma consulta existente.
-     *
-     * Mantém a assinatura:
-     *  suspend fun cancelar(body: CancelarConsultaDTO): AppResult<Int>
-     *
-     * Regras aqui:
-     *  - Se idConsulta for nulo → Error
-     *  - Se não encontrar a consulta → 404
-     *  - Se já estiver CANCELADA → 409
-     *  - Se cancelar com sucesso → 200
-     *
-     * (cpfPaciente / dataHoraConsulta são ignorados na busca; usamos idConsulta)
-     */
     suspend fun cancelar(body: CancelarConsultaDTO): AppResult<Int> {
         return try {
             val idConsulta = body.idConsulta
@@ -320,13 +245,11 @@ class ConsultasFirebaseRepository(
             val snap = consultaRef.get().await()
 
             if (!snap.exists()) {
-                // Simula HTTP 404 - NOT FOUND
                 return AppResult.Success(404)
             }
 
             val statusAtual = snap.getString("status") ?: STATUS_AGENDADA
             if (statusAtual == STATUS_CANCELADA) {
-                // Já está cancelada → simula 409 - CONFLICT
                 return AppResult.Success(409)
             }
 
@@ -335,13 +258,11 @@ class ConsultasFirebaseRepository(
             val updates = mapOf(
                 "status" to STATUS_CANCELADA,
                 "usuario_ultima_atualizacao" to currentUid,
-                // opcional: salvar justificativa
                 "justificativa_cancelamento" to (body.justificativa ?: "")
             )
 
             consultaRef.update(updates).await()
 
-            // Sucesso – simula HTTP 200 OK
             AppResult.Success(200)
         } catch (e: Exception) {
             AppResult.Error(e)
@@ -349,7 +270,110 @@ class ConsultasFirebaseRepository(
     }
 
     // =========================================================
-    // HELPERS / MAPEAMENTO DTOs
+    // CONSULTAS DE HOJE
+    // =========================================================
+
+    /** 🔹 Retorna consultas AGENDADAS do paciente apenas para o dia de HOJE */
+    suspend fun listarDeHojePorPaciente(idPaciente: String): AppResult<List<ConsultaDTO>> {
+        return try {
+            val pacienteRef = pacientesCollection.document(idPaciente)
+
+            // 🔹 Busca TODAS as consultas do paciente (SIMPLÃO, como as outras)
+            val snapshot = consultasCollection
+                .whereEqualTo("ref_paciente", pacienteRef)
+                .get()
+                .await()
+
+            // Definindo o intervalo de hoje [00:00, amanhã 00:00)
+            val calInicio = Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+
+            val calFim = (calInicio.clone() as Calendar).apply {
+                add(Calendar.DAY_OF_MONTH, 1)
+            }
+
+            val inicioDia = calInicio.time
+            val fimDia = calFim.time
+
+            val lista = snapshot.documents.mapNotNull { doc ->
+                val dataHora = doc.get("data_hora") as? Timestamp
+                val status = doc.getString("status") ?: STATUS_AGENDADA
+                val refMedico = doc.get("ref_medico") as? DocumentReference
+                val refPaciente = doc.get("ref_paciente") as? DocumentReference
+
+                val data = dataHora?.toDate() ?: return@mapNotNull null
+
+                // 🔍 Filtro EM MEMÓRIA: só AGENDADA e entre início e fim do dia
+                if (status != STATUS_AGENDADA) return@mapNotNull null
+                if (data.before(inicioDia) || !data.before(fimDia)) return@mapNotNull null
+
+                mapToConsultaDTO(
+                    id = doc.id,
+                    dataHora = dataHora,
+                    refMedico = refMedico,
+                    refPaciente = refPaciente,
+                    status = status
+                )
+            }.sortedBy { it.dataHoraConsulta }
+
+            AppResult.Success(lista)
+        } catch (e: Exception) {
+            AppResult.Error(e)
+        }
+    }
+    // ConsultasFirebaseRepository.kt
+    suspend fun listarDeHojeParaPacienteLogado(): AppResult<List<ConsultaDTO>> {
+        return try {
+            val uid = auth.currentUser?.uid
+                ?: return AppResult.Error(IllegalStateException("Usuário não autenticado"))
+
+            val userSnap = firestore.collection("users")
+                .document(uid)
+                .get()
+                .await()
+
+            // Se não tiver documento do usuário, apenas retorna lista vazia
+            if (!userSnap.exists()) {
+                // Log opcional
+                android.util.Log.w(
+                    "ConsultasRepo",
+                    "Documento users/$uid não encontrado. Retornando lista vazia."
+                )
+                return AppResult.Success(emptyList())
+            }
+
+            val rawPacienteRef = userSnap.get("paciente_ref")
+
+            // Aceita tanto DocumentReference quanto String (id simples)
+            val idPaciente = when (rawPacienteRef) {
+                is DocumentReference -> rawPacienteRef.id
+                is String -> rawPacienteRef
+                else -> null
+            }
+
+            if (idPaciente == null) {
+                android.util.Log.w(
+                    "ConsultasRepo",
+                    "Campo 'paciente_ref' ausente ou inválido em users/$uid. Retornando lista vazia."
+                )
+                return AppResult.Success(emptyList())
+            }
+
+            listarDeHojePorPaciente(idPaciente)
+
+        } catch (e: Exception) {
+            android.util.Log.e("ConsultasRepo", "Erro em listarDeHojeParaPacienteLogado", e)
+            AppResult.Error(e)
+        }
+    }
+
+
+    // =========================================================
+    // HELPERS
     // =========================================================
 
     private fun mapToConsultaDTO(
@@ -382,14 +406,12 @@ class ConsultasFirebaseRepository(
         )
     }
 
-    /** Formata Timestamp em ISO-8601 aproximado (string) para o DTO */
     private fun formatTimestamp(ts: Timestamp?): String {
         if (ts == null) return ""
         val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault())
         return sdf.format(ts.toDate())
     }
 
-    /** Converte string ISO-8601 em Timestamp (fallback: now) */
     private fun parseIsoToTimestamp(iso: String): Timestamp {
         return try {
             val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX", Locale.getDefault())
