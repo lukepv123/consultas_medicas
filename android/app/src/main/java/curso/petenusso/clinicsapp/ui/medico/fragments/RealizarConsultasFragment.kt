@@ -12,6 +12,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import curso.petenusso.clinicsapp.api.prontuarios.dto.CreateProntuarioRequest
 import curso.petenusso.clinicsapp.core.AppResult
 import curso.petenusso.clinicsapp.core.Navigator
+import curso.petenusso.clinicsapp.data.firebase.PacienteFirebaseRepository
+import curso.petenusso.clinicsapp.data.firebase.ProntuarioFirebaseRepository
 import curso.petenusso.clinicsapp.data.paciente.PacienteRepository
 import curso.petenusso.clinicsapp.data.prontuario.ProntuarioRepository
 import curso.petenusso.clinicsapp.databinding.FragmentRealizarConsultasBinding
@@ -30,6 +32,10 @@ class RealizarConsultasFragment : Fragment() {
 
     private val prontuarioRepo = ProntuarioRepository()
     private val pacienteRepo = PacienteRepository()
+    private val pacienteFirebaseRepo by lazy { PacienteFirebaseRepository() }
+    private val prontuarioFirebaseRepo by lazy { ProntuarioFirebaseRepository() }
+
+
 
     // guardamos o e-mail carregado do paciente
     private var pacienteEmail: String? = null
@@ -74,6 +80,12 @@ class RealizarConsultasFragment : Fragment() {
                 return@setOnClickListener
             }
 
+            // 🔴 Validação dos campos obrigatórios
+            if (!areAllFieldsFilled()) {
+                Toast.makeText(requireContext(), "Preencha todos os campos!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             val alergias = binding.inputAlergias.text.toString()
             val deficiencia = binding.inputDeficiencia.text.toString()
             val comorbidade = binding.inputComorbidade.text.toString()
@@ -103,22 +115,28 @@ class RealizarConsultasFragment : Fragment() {
                 return@setOnClickListener
             }
 
+            // 🔴 Validação dos campos obrigatórios
+            if (!areAllFieldsFilled()) {
+                Toast.makeText(requireContext(), "Preencha todos os campos!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             val subject = "Prontuário da consulta"
             val message = """
-                Olá ${pacienteNome ?: "paciente"},
-                
-                Segue o resumo do prontuário da sua consulta:
+        Olá ${pacienteNome ?: "paciente"},
+        
+        Segue o resumo do prontuário da sua consulta:
 
-                Atendimento: ${binding.inputAtendimento.text}
-                Alergias: ${binding.inputAlergias.text}
-                Deficiência: ${binding.inputDeficiencia.text}
-                Comorbidades: ${binding.inputComorbidade.text}
-                Exames solicitados: ${binding.inputExames.text}
-                Medicação: ${binding.inputMedicacao.text}
+        Atendimento: ${binding.inputAtendimento.text}
+        Alergias: ${binding.inputAlergias.text}
+        Deficiência: ${binding.inputDeficiencia.text}
+        Comorbidades: ${binding.inputComorbidade.text}
+        Exames solicitados: ${binding.inputExames.text}
+        Medicação: ${binding.inputMedicacao.text}
 
-                Atenciosamente,
-                Dr(a). ${SessionManager.asMedico()?.nome ?: "Médico(a)"}
-            """.trimIndent()
+        Atenciosamente,
+        Dr(a). ${SessionManager.asMedico()?.nome ?: "Médico(a)"}
+    """.trimIndent()
 
             val emailIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "message/rfc822"
@@ -139,7 +157,7 @@ class RealizarConsultasFragment : Fragment() {
     // 🔹 Busca os dados do paciente pelo ID (usa PacienteRepository)
     private suspend fun buscarInformacoesPaciente(id: String) {
         withContext(Dispatchers.IO) {
-            val result = pacienteRepo.buscarPaciente(id)
+            val result = pacienteFirebaseRepo.buscarPaciente(id)
             withContext(Dispatchers.Main) {
                 when (result) {
                     is AppResult.Success -> {
@@ -162,7 +180,7 @@ class RealizarConsultasFragment : Fragment() {
 
     private suspend fun enviarProntuario(request: CreateProntuarioRequest) {
         withContext(Dispatchers.IO) {
-            val result = prontuarioRepo.criarProntuario(request)
+            val result = prontuarioFirebaseRepo.criarProntuario(request)
 
             withContext(Dispatchers.Main) {
                 when (result) {
@@ -192,6 +210,26 @@ class RealizarConsultasFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+
+    private fun areAllFieldsFilled(): Boolean {
+        val alergias = binding.inputAlergias.text.toString().trim()
+        val deficiencia = binding.inputDeficiencia.text.toString().trim()
+        val comorbidade = binding.inputComorbidade.text.toString().trim()
+        val exames = binding.inputExames.text.toString().trim()
+        val medicacao = binding.inputMedicacao.text.toString().trim()
+        val atendimento = binding.inputAtendimento.text.toString().trim()
+
+        return alergias.isNotEmpty()
+                && deficiencia.isNotEmpty()
+                && comorbidade.isNotEmpty()
+                && exames.isNotEmpty()
+                && medicacao.isNotEmpty()
+                && atendimento.isNotEmpty()
+    }
+
+
+
 
     companion object {
         @JvmStatic

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "348974507696",
+    "project_id": "appclinics-12afb",
+    "storage_bucket": "appclinics-12afb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:348974507696:android:502002029a9f57e1eafd75",
+        "android_client_info": {
+          "package_name": "curso.petenusso.clinicsapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsW8GWLkVpxVHHiC7hYRfHSfqNqJuy01o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

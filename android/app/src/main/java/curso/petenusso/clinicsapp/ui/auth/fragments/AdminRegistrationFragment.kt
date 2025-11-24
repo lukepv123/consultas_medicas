@@ -15,6 +15,7 @@ import curso.petenusso.clinicsapp.R
 import curso.petenusso.clinicsapp.core.AppResult
 import curso.petenusso.clinicsapp.core.Navigator
 import curso.petenusso.clinicsapp.data.adm.AdminRepository
+import curso.petenusso.clinicsapp.data.firebase.AdmFirebaseRepository
 import curso.petenusso.clinicsapp.databinding.FragmentAdminRegistrationBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,6 +28,8 @@ class AdminRegistrationFragment : Fragment() {
 
     // ✅ Usa apenas o repositório (sem Retrofit direto)
     private val adminRepo by lazy { AdminRepository() }
+
+    private val adminRepoFirebase by lazy { AdmFirebaseRepository() }
 
     companion object {
         private const val EMAIL_MAX = 120
@@ -138,7 +141,7 @@ class AdminRegistrationFragment : Fragment() {
         setLoading(true)
 
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            val result = adminRepo.createAdmin(email, senha)
+            val result = adminRepoFirebase.createAdmin(email, senha)
 
             withContext(Dispatchers.Main) {
                 setLoading(false)

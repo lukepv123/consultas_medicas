@@ -16,6 +16,8 @@ import curso.petenusso.clinicsapp.api.consulta.dto.ConsultaResumoDTO
 import curso.petenusso.clinicsapp.core.AppResult
 import curso.petenusso.clinicsapp.core.Navigator
 import curso.petenusso.clinicsapp.data.consultas.ConsultaRepository
+import curso.petenusso.clinicsapp.data.firebase.ConsultasFirebaseRepository
+import curso.petenusso.clinicsapp.data.firebase.PacienteFirebaseRepository
 import curso.petenusso.clinicsapp.data.paciente.PacienteRepository
 import curso.petenusso.clinicsapp.databinding.FragmentCancelarConsultaAdmBinding
 import kotlinx.coroutines.launch
@@ -27,6 +29,12 @@ class CancelarConsultaAdmFragment : Fragment() {
     // ✅ Agora só usa os repositórios
     private val pacienteRepo by lazy { PacienteRepository() }
     private val consultaRepo by lazy { ConsultaRepository() }
+
+
+    private val pacienteFirebaseRepo by lazy { PacienteFirebaseRepository() }
+    private val consultaFirebaseRepo by lazy { ConsultasFirebaseRepository() }
+
+
 
     private var consultasCarregadas: List<ConsultaResumoDTO> = emptyList()
     private val CPF_DIGITS_ONLY = Regex("^[0-9]{11}$")
@@ -66,12 +74,12 @@ class CancelarConsultaAdmFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 // 🔹 1️⃣ Buscar ID do paciente via repository
-                when (val idResult = pacienteRepo.buscarIdPorCpf(cpf)) {
+                when (val idResult = pacienteFirebaseRepo.buscarIdPorCpf(cpf)) {
                     is AppResult.Success -> {
                         val pacienteId = idResult.data
 
                         // 🔹 2️⃣ Listar consultas futuras via repository
-                        when (val resp = consultaRepo.listarFuturasPorPaciente(pacienteId)) {
+                        when (val resp = consultaFirebaseRepo.listarFuturasPorPaciente(pacienteId)) {
                             is AppResult.Success -> {
                                 val todas = resp.data
                                 val filtradas = todas.filter { it.status.equals("AGENDADA", ignoreCase = true) }
@@ -169,7 +177,7 @@ class CancelarConsultaAdmFragment : Fragment() {
         setLoading(true)
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val resp = consultaRepo.cancelar(body)
+                val resp = consultaFirebaseRepo.cancelar(body)
                 setLoading(false)
                 if (resp is AppResult.Success && resp.data in listOf(200, 204)) {
                     toast("Consulta cancelada com sucesso.")

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.datepicker.CalendarConstraints
@@ -16,6 +17,8 @@ import curso.petenusso.clinicsapp.api.consulta.dto.CreateConsultaRequest
 import curso.petenusso.clinicsapp.core.AppResult
 import curso.petenusso.clinicsapp.core.Navigator
 import curso.petenusso.clinicsapp.data.consultas.ConsultaRepository
+import curso.petenusso.clinicsapp.data.firebase.ConsultasFirebaseRepository
+import curso.petenusso.clinicsapp.data.firebase.MedicoFirebaseRepository
 import curso.petenusso.clinicsapp.data.medico.MedicoRepository
 import curso.petenusso.clinicsapp.databinding.FragmentAgendarConsultaPacienteBinding
 import curso.petenusso.clinicsapp.model.medico.Especialidade
@@ -34,6 +37,9 @@ class AgendarConsultaPacienteFragment : Fragment() {
     // ✅ Substituindo Retrofit direto por repositories
     private val medicoRepo = MedicoRepository()
     private val consultaRepo = ConsultaRepository()
+
+    private val medicoFirebaseRepo by lazy { MedicoFirebaseRepository() }
+    private val consultasFirebaseRepo by lazy { ConsultasFirebaseRepository() }
 
     private var dataSelecionada: Calendar? = null
     private var medicoSelecionado: curso.petenusso.clinicsapp.api.medico.dto.MedicoDTO? = null
@@ -129,7 +135,7 @@ class AgendarConsultaPacienteFragment : Fragment() {
     private fun carregarMedicosPorEspecialidade(especialidade: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                when (val result = medicoRepo.listar()) {
+                when (val result = medicoFirebaseRepo.listar()) {
                     is AppResult.Success -> {
                         val medicosFiltrados = result.data.data.filter {
                             it.especialidade.equals(especialidade, ignoreCase = true)
@@ -190,6 +196,7 @@ class AgendarConsultaPacienteFragment : Fragment() {
             .setMessage("Deseja agendar a consulta em ${SimpleDateFormat("dd/MM/yyyy").format(data.time)} às $hora com Dr(a). ${medico.nome}?")
             .setPositiveButton("Sim") { _, _ ->
                 cadastrarConsulta(dataHora, medico.id, paciente.pacienteId)
+
             }
             .setNegativeButton("Não", null)
             .show()
@@ -200,11 +207,14 @@ class AgendarConsultaPacienteFragment : Fragment() {
     // ======================================================
     private fun cadastrarConsulta(dataHora: String, idMedico: String, idPaciente: String) {
         lifecycleScope.launch(Dispatchers.IO) {
-            when (val result = consultaRepo.cadastrar(CreateConsultaRequest(dataHora, idMedico, idPaciente))) {
+            when (val result = consultasFirebaseRepo.cadastrar(CreateConsultaRequest(dataHora, idMedico, idPaciente))) {
                 is AppResult.Success -> {
                     withContext(Dispatchers.Main) {
                         when (result.data) {
-                            201 -> Snackbar.make(binding.root, "✅ Consulta cadastrada com sucesso!", Snackbar.LENGTH_LONG).show()
+                            201 -> {
+                                Snackbar.make(binding.root, "✅ Consulta cadastrada com sucesso!", Snackbar.LENGTH_LONG).show()
+                                Navigator.showPacienteLobby(requireActivity() as AppCompatActivity)
+                            }
                             409 -> Snackbar.make(binding.root, "⚠️ Horário indisponível, escolha outro.", Snackbar.LENGTH_LONG).show()
                             422 -> Snackbar.make(binding.root, "⚠️ Data/hora inválida.", Snackbar.LENGTH_LONG).show()
                             401, 403 -> Snackbar.make(binding.root, "Sessão expirada, faça login novamente.", Snackbar.LENGTH_LONG).show()

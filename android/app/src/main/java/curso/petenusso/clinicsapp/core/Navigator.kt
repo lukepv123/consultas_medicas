@@ -138,7 +138,6 @@ object Navigator {
 
     fun showDadosPessoaisPaciente(host: Fragment) {
         replaceFragment(host.requireActivity() as AppCompatActivity, PACIENTE_CONTAINER_ID, DadosPacienteFragment())
-
     }
 
 

@@ -14,6 +14,8 @@ import com.google.android.material.snackbar.Snackbar
 import curso.petenusso.clinicsapp.core.AppResult
 import curso.petenusso.clinicsapp.core.Navigator
 import curso.petenusso.clinicsapp.data.consultas.ConsultaRepository
+import curso.petenusso.clinicsapp.data.firebase.ConsultasFirebaseRepository
+import curso.petenusso.clinicsapp.data.firebase.MedicoFirebaseRepository
 import curso.petenusso.clinicsapp.data.medico.MedicoRepository
 import curso.petenusso.clinicsapp.databinding.FragmentMinhasConsultasPacienteBinding
 import curso.petenusso.clinicsapp.model.session.SessionManager
@@ -33,6 +35,12 @@ class MinhasConsultasPacienteFragment : Fragment() {
     // ✅ Repositórios centralizados
     private val consultaRepo = ConsultaRepository()
     private val medicoRepo = MedicoRepository()
+
+
+    private val medicoFirebaseRepo by lazy { MedicoFirebaseRepository() }
+    private val consultasFirebaseRepo by lazy { ConsultasFirebaseRepository() }
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,14 +74,14 @@ class MinhasConsultasPacienteFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 // 1️⃣ Busca consultas
-                val futurasResult = consultaRepo.listarFuturas(idPaciente)
-                val passadasResult = consultaRepo.listarPassadas(idPaciente)
+                val futurasResult = consultasFirebaseRepo.listarFuturas(idPaciente)
+                val passadasResult = consultasFirebaseRepo.listarPassadas(idPaciente)
 
                 val futuras = if (futurasResult is AppResult.Success) futurasResult.data else emptyList()
                 val passadas = if (passadasResult is AppResult.Success) passadasResult.data else emptyList()
 
                 // 2️⃣ Busca lista de médicos uma única vez
-                val medicosResult = medicoRepo.listar()
+                val medicosResult = medicoFirebaseRepo.listar()
                 val medicosMap = if (medicosResult is AppResult.Success) {
                     medicosResult.data.data.associateBy { it.id }
                 } else emptyMap()
